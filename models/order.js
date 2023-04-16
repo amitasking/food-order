@@ -1,17 +1,25 @@
-const orders = []
+const {Sequelize} = require('sequelize');
+const seq = require('../util/database')
 
-module.exports = class Order {
-    constructor(name, date , empId){
-        this.name = name;
-        this.date = date;
-        this.empId = empId
-    }
+const Order = seq.define('Order', {
+    id : {
+        type : Sequelize.INTEGER,
+        autoIncrement : true,
+        allowNull : false,
+        primaryKey : true
+    },
 
-    save(){
-        orders.push(this);
-    }
+    name : {
+       type : Sequelize.STRING
+    },
 
-    static fetchAllOrder(){
-        return orders
+    date : {
+        type : Sequelize.DATE
     }
-}
+    ,
+
+    empId : {
+        type : Sequelize.INTEGER
+    }
+});
+module.exports = Order

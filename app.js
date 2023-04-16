@@ -1,12 +1,19 @@
 var createError = require('http-errors');
 var express = require('express');
 var logger = require('morgan');
-
+var cors = require('cors')
 var adminRouter = require('./routes/admin');
 var orderRouter = require('./routes/order');
 
-var app = express();
+const seq = require('./util/database');
 
+var app = express();
+app.use(cors())
+seq.sync().then(result => {
+  console.log(result);
+}).catch(err => {
+  console.log(err);
+})
 
 app.use(logger('dev'));
 app.use(express.json());
