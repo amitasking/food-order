@@ -4,6 +4,7 @@ var logger = require('morgan');
 var cors = require('cors')
 var adminRouter = require('./routes/admin');
 var orderRouter = require('./routes/order');
+var foodItemRouter = require('./routes/food-items');
 
 const seq = require('./util/database');
 
@@ -21,6 +22,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use('/order', orderRouter);
 app.use('/admin', adminRouter);
+app.use('', foodItemRouter);
 
 
 app.listen(3000, () => {

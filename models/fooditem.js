@@ -1,7 +1,7 @@
 const {Sequelize} = require('sequelize');
 const seq = require('../util/database')
 
-const Order = seq.define('Order', {
+const FoodItem = seq.define('FoodItem', {
     id : {
         type : Sequelize.INTEGER,
         autoIncrement : true,
@@ -13,17 +13,21 @@ const Order = seq.define('Order', {
        type : Sequelize.STRING
     },
 
-    date : {
-        type : Sequelize.DATE
-    }
-    ,
-
-    empId : {
+    menuType : {
+        type : Sequelize.STRING
+    },
+    calories : {
         type : Sequelize.INTEGER
-    }
-    ,
-    type : {
+    },
+    protein : {
+        type : Sequelize.INTEGER
+    },
+    carbs : {
+        type : Sequelize.INTEGER
+    },
+
+    image : {
         type : Sequelize.STRING
     }
 });
-module.exports = Order
+module.exports = FoodItem
