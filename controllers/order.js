@@ -22,11 +22,13 @@ const client = new S3Client({
 
 module.exports.saveOrder = (req, res, next) => {
     console.log(req.body);
-    order = new Order(req.body.name, new Date(), req.body.empId);
+    let order = new Order(req.body.name, new Date(), req.body.empId);
+    console.log(req.body)
     Order.create({
-        name: req.body.name,
         date: new Date(),
-        empId: req.body.empId
+        FoodItemId : req.body.FoodItemId,
+        empId : req.body.empId,
+        type : req.body.type,
     }).then(result => {
         res.send(result);
     }).catch(err => {
@@ -39,6 +41,7 @@ module.exports.saveOrder = (req, res, next) => {
     console.log(req.body);
     order = new Order(req.body.name, new Date(), req.body.empId);
     Order.create({
+        FoodItemId : req.body.FoodItemId,
         name: req.body.name,
         date: new Date(),
         empId: req.body.empId

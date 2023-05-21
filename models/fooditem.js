@@ -9,6 +9,10 @@ const FoodItem = seq.define('FoodItem', {
         primaryKey : true
     },
 
+    description : {
+        type :  Sequelize.STRING
+    },
+
     name : {
        type : Sequelize.STRING
     },

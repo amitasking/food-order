@@ -9,9 +9,9 @@ const Order = seq.define('Order', {
         primaryKey : true
     },
 
-    name : {
-       type : Sequelize.STRING
-    },
+    // name : {
+    //    type : Sequelize.STRING
+    // },
 
     date : {
         type : Sequelize.DATE
@@ -19,7 +19,7 @@ const Order = seq.define('Order', {
     ,
 
     empId : {
-        type : Sequelize.INTEGER
+        type : Sequelize.STRING
     }
     ,
     type : {

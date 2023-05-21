@@ -7,6 +7,8 @@ var orderRouter = require('./routes/order');
 var foodItemRouter = require('./routes/food-items');
 
 const seq = require('./util/database');
+const Order = require('./models/order');
+const FoodItem = require('./models/fooditem');
 
 var app = express();
 app.use(cors())
@@ -23,8 +25,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/order', orderRouter);
 app.use('/admin', adminRouter);
 app.use('', foodItemRouter);
-
-
-app.listen(3000, () => {
-    console.log(`Example app listening on port 3000`)
-  })
+Order.belongsTo(FoodItem, {constraints : false, onDelete : 'CASCADE'})
+seq.sync({force : true}).then(res => {
+  console.log(res);
+  app.listen(3000)
+})
+.catch(err => {
+   console.log(err);
+})

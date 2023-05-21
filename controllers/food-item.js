@@ -6,7 +6,6 @@ exports.getfoodItems = (req,res,next) => {
             return res.send(result);
         })
     }
-
     else {
         FoodItem.findAll({where : {
             menuType : req.query.type
@@ -17,13 +16,15 @@ exports.getfoodItems = (req,res,next) => {
 }
 
 exports.addFoodItem = (req,res,next) => {
+    
     foodItem = FoodItem.create({
         name: req.body.name,
         menuType: req.body.type,
         calories: req.body.calories,
         protein : req.body.protein,
         carbs : req.body.carbs,
-        image : req.body.image
+        image : req.body.image,
+        description : req.body.description
     }).then(result => {
         res.send(result);
     }).catch(err => {
