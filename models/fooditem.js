@@ -32,6 +32,9 @@ const FoodItem = seq.define('FoodItem', {
 
     image : {
         type : Sequelize.STRING
+    },
+    servedOn : {
+        type : Sequelize.INTEGER
     }
 });
 module.exports = FoodItem

@@ -25,8 +25,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/order', orderRouter);
 app.use('/admin', adminRouter);
 app.use('', foodItemRouter);
-Order.belongsTo(FoodItem, {constraints : false, onDelete : 'CASCADE'})
-seq.sync({force : true}).then(res => {
+Order.belongsTo(FoodItem, {constraints : true, onDelete : 'CASCADE'})
+seq.sync({force : false}).then(res => {
   console.log(res);
   app.listen(3000)
 })

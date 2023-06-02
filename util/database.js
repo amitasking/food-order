@@ -1,10 +1,16 @@
 
 const { Sequelize } = require('sequelize');
-const seq = new Sequelize('foodorder','admin','3WviEtDNq*31', {
-    host: 'foodorder.csk8n63h5v4p.us-east-1.rds.amazonaws.com',
+// const seq = new Sequelize('foodorder','root','423Raja@@', {
+//     host: 'localhost:3306',
+//     dialect: 'mysql',
+//     // ssl: 'Amazon RDS'
+// })
+
+const seq = new Sequelize('foodorder', 'root', '423Raja@@', {
+    host: 'localhost',
     dialect: 'mysql',
-    ssl: 'Amazon RDS'
-})
+  });
+  
 
 
 module.exports = seq;
