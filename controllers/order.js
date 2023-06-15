@@ -46,7 +46,7 @@ module.exports.saveOrder = (req, res, next) => {
         date: new Date(),
         empId: req.body.empId
     }).then(result => {
-        res.send(result);
+        res.send(result)
     }).catch(err => {
         res.send(err)
     })
@@ -54,11 +54,24 @@ module.exports.saveOrder = (req, res, next) => {
 }
 
 module.exports.fetchAllOrder = (req, res, next) => {
-
-    Order.findAll().then(result => {
+    username = req.query.username
+    // Order.findAll().then(result => {
+    //     where: {
+    //         menuType: req.query.type
+    //     }
+    //     return res.send(result);
+    // })
+    Order.findAll({
+        where: {
+            empId: req.query.username
+        },
+        include : {
+            all : true
+        }
+    }).then(result => {
+        console.log(result);
         return res.send(result);
     })
-
 
 }
 

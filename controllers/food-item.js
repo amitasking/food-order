@@ -1,7 +1,7 @@
 const { where } = require("sequelize");
 const FoodItem = require("../models/fooditem");
 exports.getfoodItems = (req, res, next) => {
-
+    //res.send('hello')
     if (req.query.day && req.query.type) {
         console.log("sendind data for day " + req.query.day);
         FoodItem.findAll({

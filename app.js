@@ -9,6 +9,7 @@ var foodItemRouter = require('./routes/food-items');
 const seq = require('./util/database');
 const Order = require('./models/order');
 const FoodItem = require('./models/fooditem');
+const FoodType = require('./models/foodtype');
 
 var app = express();
 app.use(cors())
@@ -26,7 +27,9 @@ app.use('/order', orderRouter);
 app.use('/admin', adminRouter);
 app.use('', foodItemRouter);
 Order.belongsTo(FoodItem, {constraints : true, onDelete : 'CASCADE'})
+FoodItem.belongsTo(FoodType, {constraints : true, onDelete : 'CASCADE'})
 seq.sync({force : false}).then(res => {
+
   console.log(res);
   app.listen(3000)
 })
