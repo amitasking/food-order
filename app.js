@@ -36,7 +36,7 @@ FoodItem.belongsTo(FoodType, {constraints : true, onDelete : 'CASCADE'})
 seq.sync({force : false}).then(res => {
 
   console.log(res);
-  app.listen(3000)
+  app.listen(4000)
 })
 .catch(err => {
    console.log(err);

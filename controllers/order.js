@@ -39,7 +39,7 @@ const client = new S3Client({
 module.exports.saveOrder = (req, res, next) => {
     console.log(req.body);
     Order.create({
-        FoodItemId : req.body.foodItemId,
+        FoodItemId : req.body.FoodItemId,
         name: req.body.name,
         date: new Date(),
         empId: req.body.empId
