@@ -2,6 +2,7 @@ const Order = require("../models/order");
 const QRCode = require('qrcode');
 const fs = require('fs');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const excelExporter = require("../services/exportToExcel");
 
 const {
     S3Client,
@@ -51,7 +52,7 @@ module.exports.saveOrder = (req, res, next) => {
 
 }
 
-module.exports.fetchAllOrder = (req, res, next) => {
+module.exports.fetchOrdersForUser = (req, res, next) => {
     username = req.query.username
     // Order.findAll().then(result => {
     //     where: {
@@ -73,9 +74,23 @@ module.exports.fetchAllOrder = (req, res, next) => {
 
 }
 
-// module.exports.getAllOrders = (req, res, next) => {
-//     res.send(Order.fetchAllOrder())
-//  }
+const workSheetColumnNames = [
+    "Employee Id",
+    "Name"
+];
+const filePath = './orders.xlsx';
+
+module.exports.getAllOrders = (req, res, next) => {
+    Order.findAll({
+        include : {
+            all : true
+        }
+    }).then(result => {
+        console.log(result);
+        excelExporter.exportOrdersToExcel(result, workSheetColumnNames, filePath);
+        return res.send(result);
+    });
+ }
 
 //  const s3 = new S3({
 //    accessKeyId: 'AKIAZDF6IK5WXADBBQGS',
