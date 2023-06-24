@@ -38,6 +38,19 @@ const client = new S3Client({
 // }
 
 module.exports.saveOrder = (req, res, next) => {
+    // const currentDateTime = new Date();
+    // const currentHour = currentDateTime.getHours();
+    // const currentMinutes = currentDateTime.getMinutes();
+    // if (this.foodItem && this.foodItem.servedOn == new Date().getDay()) {
+    //   if (this.foodItem.menuType == 'lunch' && (currentHour < 10 || (currentHour === 10 && currentMinutes === 0)))
+    //     return true;
+    //   if (this.foodItem.menuType == 'dinner' && (currentHour < 16 || (currentHour === 16 && currentMinutes === 0)))
+    //     return true;
+    //   return false;
+    // }
+    // return true;
+  
+
     console.log(req.body);
     Order.create({
         FoodItemId : req.body.FoodItemId,
