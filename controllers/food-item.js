@@ -40,6 +40,16 @@ exports.getfoodItems = (req, res, next) => {
             return res.send(result);
         })
     }
+
+    else if (req.query.id){
+        FoodItem.findOne({
+            where: {
+                id: req.query.id
+            }
+        }).then(result => {
+            return res.send(result);
+        })
+    }
 }
 
 exports.addFoodItem = (req, res, next) => {

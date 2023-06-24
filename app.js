@@ -12,7 +12,9 @@ const FoodItem = require('./models/fooditem');
 const FoodType = require('./models/foodtype');
 
 var app = express();
+
 app.use(cors())
+
 seq.sync().then(result => {
   console.log(result);
 }).catch(err => {
@@ -25,7 +27,9 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use('/order', orderRouter);
 app.use('/admin', adminRouter);
-app.use('', foodItemRouter);
+app.use('/fooditem', foodItemRouter);
+
+
 Order.belongsTo(FoodItem, {constraints : true, onDelete : 'CASCADE'})
 FoodItem.belongsTo(FoodType, {constraints : true, onDelete : 'CASCADE'})
 seq.sync({force : false}).then(res => {
