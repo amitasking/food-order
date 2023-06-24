@@ -29,9 +29,10 @@ app.use('/order', orderRouter);
 app.use('/admin', adminRouter);
 app.use('/fooditem', foodItemRouter);
 
-
+// association
 Order.belongsTo(FoodItem, {constraints : true, onDelete : 'CASCADE'})
 FoodItem.belongsTo(FoodType, {constraints : true, onDelete : 'CASCADE'})
+
 seq.sync({force : false}).then(res => {
 
   console.log(res);

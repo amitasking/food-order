@@ -9,10 +9,6 @@ const Order = seq.define('Order', {
         primaryKey : true
     },
 
-    // name : {
-    //    type : Sequelize.STRING
-    // },
-
     date : {
         type : Sequelize.DATE
     }
