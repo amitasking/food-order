@@ -43,7 +43,6 @@ module.exports.saveOrder = (req, res, next) => {
 
 module.exports.fetchOrdersForUser = (req, res, next) => {
     username = req.query.username
-
     Order.findAll({
         where: {
             empId: req.query.username

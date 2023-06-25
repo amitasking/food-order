@@ -10,6 +10,7 @@
     "@aws-sdk/client-ses": "^3.359.0",
     "@aws-sdk/s3-request-presigner": "^3.312.0",
     "aws-sdk": "^2.1404.0",
+    "axios": "^1.4.0",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
