@@ -6,10 +6,13 @@ var adminRouter = require('./routes/admin');
 var orderRouter = require('./routes/order');
 var foodItemRouter = require('./routes/food-items');
 var axios = require('axios')
+var organizationRouter = require('./routes/organization');
+
 const seq = require('./util/database');
 const Order = require('./models/order');
 const FoodItem = require('./models/fooditem');
 const FoodType = require('./models/foodtype');
+const Organization = require('./models/organization');
 
 var app = express();
 
@@ -56,15 +59,17 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/order', orderRouter);
 app.use('/admin', adminRouter);
 app.use('/fooditem', foodItemRouter);
+app.use('/organization', organizationRouter);
 
 // association
 Order.belongsTo(FoodItem, {constraints : true, onDelete : 'CASCADE'})
 FoodItem.belongsTo(FoodType, {constraints : true, onDelete : 'CASCADE'})
+FoodItem.belongsTo(Organization, {constraints : true, onDelete : 'CASCADE'})
 
 seq.sync({force : false}).then(res => {
 
   console.log(res);
-  app.listen(4000)
+  app.listen(3000)
 })
 .catch(err => {
    console.log(err);
