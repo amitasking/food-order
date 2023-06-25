@@ -55,6 +55,7 @@ exports.getfoodItems = (req, res, next) => {
 exports.addFoodItem = (req, res, next) => {
 
     foodItem = FoodItem.create({
+        OrganizationId: req.body.OrganizationId,
         name: req.body.name,
         menuType: req.body.menuType,
         calories: req.body.calories,
