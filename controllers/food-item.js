@@ -7,7 +7,8 @@ exports.getfoodItems = (req, res, next) => {
         FoodItem.findAll({
             where: {
                 servedOn: req.query.day,
-                menuType: req.query.type
+                menuType: req.query.type,
+                OrganizationDomain: req.body.OrganizationDomain
             }
         }).then(result => {
             return res.send(result);
@@ -16,7 +17,8 @@ exports.getfoodItems = (req, res, next) => {
     else if (req.query.type) {
         FoodItem.findAll({
             where: {
-                menuType: req.query.type
+                menuType: req.query.type,
+                OrganizationDomain: req.body.OrganizationDomain
             }
         }).then(result => {
             return res.send(result);
@@ -27,7 +29,8 @@ exports.getfoodItems = (req, res, next) => {
         // console.log("sendind data for day " + req.query.day);
         FoodItem.findAll({
             where: {
-                servedOn: req.query.day
+                servedOn: req.query.day,
+                OrganizationDomain: req.body.OrganizationDomain
             }
         }).then(result => {
             return res.send(result);
@@ -36,7 +39,11 @@ exports.getfoodItems = (req, res, next) => {
 
 
     else if (req.query.all) {
-        FoodItem.findAll().then(result => {
+        FoodItem.findAll({
+            where: {
+                OrganizationDomain: req.body.OrganizationDomain
+            }
+        }).then(result => {
             return res.send(result);
         })
     }
@@ -55,7 +62,7 @@ exports.getfoodItems = (req, res, next) => {
 exports.addFoodItem = (req, res, next) => {
 
     foodItem = FoodItem.create({
-        OrganizationId: req.body.OrganizationId,
+        OrganizationDomain: req.body.OrganizationDomain,
         name: req.body.name,
         menuType: req.body.menuType,
         calories: req.body.calories,

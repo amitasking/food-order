@@ -2,15 +2,11 @@ const {Sequelize, DataTypes} = require('sequelize');
 const seq = require('../util/database')
 
 const Organization = seq.define('Organization', {
-    id : {
-        type : DataTypes.INTEGER,
-        autoIncrement : true,
-        allowNull : false,
-        primaryKey : true
-    },
 
     domain : {
-        type :  DataTypes.STRING
+        type :  DataTypes.STRING,
+        allowNull : false,
+        primaryKey : true
     },
 
     lunch_cutoff : {
