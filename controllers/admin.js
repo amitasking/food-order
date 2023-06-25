@@ -1,3 +1,5 @@
+const createSendEmailCommand = require('../services/ses');
+
 exports.admin = (req,res,next) => {
-    res.send("admin");
+    createSendEmailCommand
 }

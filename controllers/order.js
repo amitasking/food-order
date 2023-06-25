@@ -12,30 +12,6 @@ const {
 const PassThrough = require('stream');
 const { Blob } = require("buffer");
 
-// import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-
-const client = new S3Client({
-    region: 'us-east-1'
-});
-
-
-
-
-// module.exports.saveOrder = (req, res, next) => {
-   
-//     console.log(req.body)
-//     Order.create({
-//         date: new Date(),
-//         FoodItemId : req.body.foodItemId,
-//         empId : req.body.empId,
-//         type : req.body.type,
-//     }).then(result => {
-//         res.send(result);
-//     }).catch(err => {
-
-//     })
-
-// }
 
 module.exports.saveOrder = (req, res, next) => {
     // const currentDateTime = new Date();
@@ -67,12 +43,7 @@ module.exports.saveOrder = (req, res, next) => {
 
 module.exports.fetchOrdersForUser = (req, res, next) => {
     username = req.query.username
-    // Order.findAll().then(result => {
-    //     where: {
-    //         menuType: req.query.type
-    //     }
-    //     return res.send(result);
-    // })
+
     Order.findAll({
         where: {
             empId: req.query.username
@@ -100,15 +71,10 @@ module.exports.getAllOrders = (req, res, next) => {
         }
     }).then(result => {
         console.log(result);
-        excelExporter.exportOrdersToExcel(result, workSheetColumnNames, filePath);
-        return res.send(result);
+        return res.send(excelExporter.exportOrdersToExcel(result, workSheetColumnNames, filePath));
+       // return res.send(result);
     });
  }
-
-//  const s3 = new S3({
-//    accessKeyId: 'AKIAZDF6IK5WXADBBQGS',
-//    secretAccessKey: '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',
-//  })
 
 module.exports.book = (req,res) => {
    const otpGenerator = require('otp-generator')
@@ -125,9 +91,9 @@ module.exports.qrcode = async (req, res, next) => {
 
         const f = fs.readFileSync(name)
         const command = new PutObjectCommand({
-            Bucket: "testbucketamitt",
+            Bucket: "food-order-orders",
+            Body: Buffer.from(buffer, 'base64'),
             Key: name,
-            Body: f
         });
 
         try {
