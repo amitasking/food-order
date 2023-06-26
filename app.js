@@ -68,7 +68,7 @@ Order.belongsTo(FoodItem, {constraints : true, onDelete : 'CASCADE'})
 FoodItem.belongsTo(FoodType, {constraints : true, onDelete : 'CASCADE'})
 FoodItem.belongsTo(Organization, {constraints : true, onDelete : 'CASCADE'})
 
-seq.sync({force : false}).then(res => {
+seq.sync({force : true}).then(res => {
 
   console.log(res);
   app.listen(4000)
