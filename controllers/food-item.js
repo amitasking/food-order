@@ -1,14 +1,18 @@
 const { where } = require("sequelize");
 const FoodItem = require("../models/fooditem");
+
 exports.getfoodItems = (req, res, next) => {
-    //res.send('hello')
+    //res.send(req.user);
+    const user = req.user
+    const domain = user.split("@")[1] ? user.split("@")[1] : "";
+    
     if (req.query.day && req.query.type) {
         console.log("sendind data for day " + req.query.day);
         FoodItem.findAll({
             where: {
                 servedOn: req.query.day,
                 menuType: req.query.type,
-                OrganizationDomain: req.body.OrganizationDomain
+                OrganizationDomain: domain
             }
         }).then(result => {
             return res.send(result);
@@ -18,7 +22,7 @@ exports.getfoodItems = (req, res, next) => {
         FoodItem.findAll({
             where: {
                 menuType: req.query.type,
-                OrganizationDomain: req.body.OrganizationDomain
+                OrganizationDomain: domain
             }
         }).then(result => {
             return res.send(result);
@@ -30,7 +34,7 @@ exports.getfoodItems = (req, res, next) => {
         FoodItem.findAll({
             where: {
                 servedOn: req.query.day,
-                OrganizationDomain: req.body.OrganizationDomain
+                OrganizationDomain: domain
             }
         }).then(result => {
             return res.send(result);
@@ -41,7 +45,7 @@ exports.getfoodItems = (req, res, next) => {
     else if (req.query.all) {
         FoodItem.findAll({
             where: {
-                OrganizationDomain: req.body.OrganizationDomain
+                OrganizationDomain: domain
             }
         }).then(result => {
             return res.send(result);
@@ -62,7 +66,7 @@ exports.getfoodItems = (req, res, next) => {
 exports.addFoodItem = (req, res, next) => {
 
     foodItem = FoodItem.create({
-        OrganizationDomain: req.body.OrganizationDomain,
+        OrganizationDomain: domain,
         name: req.body.name,
         menuType: req.body.menuType,
         calories: req.body.calories,

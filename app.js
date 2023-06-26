@@ -36,7 +36,7 @@ app.use(async (req, res, next) => {
           }
       )
 
-      req.user = data;
+      req.user = data.UserAttributes[2].Value
       next();
   } catch (error) {
        console.log(error);
@@ -69,7 +69,7 @@ FoodItem.belongsTo(Organization, {constraints : true, onDelete : 'CASCADE'})
 seq.sync({force : false}).then(res => {
 
   console.log(res);
-  app.listen(3000)
+  app.listen(4000)
 })
 .catch(err => {
    console.log(err);

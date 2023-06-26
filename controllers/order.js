@@ -1,4 +1,6 @@
 const Order = require("../models/order");
+const Organization = require("../models/organization");
+const FoodItem = require("../models/fooditem");
 const QRCode = require('qrcode');
 const fs = require('fs');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
@@ -12,32 +14,58 @@ const {
 const PassThrough = require('stream');
 const { Blob } = require("buffer");
 
-
+/**
+ * 
+ * later add logic to get the cutoff time 
+ * from organization and remove the hardcoded value
+ */
 module.exports.saveOrder = (req, res, next) => {
-    // const currentDateTime = new Date();
-    // const currentHour = currentDateTime.getHours();
-    // const currentMinutes = currentDateTime.getMinutes();
-    // if (this.foodItem && this.foodItem.servedOn == new Date().getDay()) {
-    //   if (this.foodItem.menuType == 'lunch' && (currentHour < 10 || (currentHour === 10 && currentMinutes === 0)))
-    //     return true;
-    //   if (this.foodItem.menuType == 'dinner' && (currentHour < 16 || (currentHour === 16 && currentMinutes === 0)))
-    //     return true;
-    //   return false;
-    // }
-    // return true;
+    const user = req.user;
+    const domain = user.split("@")[1] ? user.split("@")[1] : "";
+    const result = Organization.findOne({
+        where: {
+            domain: domain
+        },
+        include : {
+            all : true
+        }
+    }).then(result => {
+        console.log(result);
+        return result;
+    })
+
+    const currentDateTime = new Date();
+    const currentHour = currentDateTime.getHours();
+    const foodItem = FoodItem.findOne({
+        where: {
+            id: req.body.FoodItemId
+        }
+    }).then(result => {
+        return result;
+    })
+    if (req.body.FoodItemId && foodItem.servedOn == new Date().getDay()) {
+      if ((foodItem.menuType == 'lunch' && currentHour < result.lunch_cutoff) || 
+      (foodItem.menuType == 'dinner' && currentHour < result.dinner_cutoff)){
+        console.log(req.body);
+        Order.create({
+            FoodItemId : req.body.FoodItemId,
+            name: foodItem.name,
+            date: new Date(),
+            empId: user
+        }).then(result => {
+            res.send(result)
+        }).catch(err => {
+            res.send(err)
+        })
+      }
+        
+     
+      return false;
+    }
+    return true;
   
 
-    console.log(req.body);
-    Order.create({
-        FoodItemId : req.body.FoodItemId,
-        name: req.body.name,
-        date: new Date(),
-        empId: req.body.empId
-    }).then(result => {
-        res.send(result)
-    }).catch(err => {
-        res.send(err)
-    })
+    
 
 }
 
