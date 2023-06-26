@@ -72,7 +72,7 @@ module.exports.sendRawMail = async () => {
     const subject = 'orders'
     const message = "hello"
   // Read the attachment file contents
-  const attachmentFilePath = "./s3.js"; // Replace with the path to your attachment file
+  const attachmentFilePath = "./qr.png"; // Replace with the path to your attachment file
   const attachmentContent = fs.readFileSync(attachmentFilePath);
 
   // Construct the raw email data
