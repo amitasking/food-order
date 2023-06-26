@@ -17,7 +17,9 @@ const Organization = require('./models/organization');
 var app = express();
 
 const COGNITO_URL = `https://cognito-idp.us-east-1.amazonaws.com/`;
-
+app.get('/health',(req,res,next)=>{
+  res.send("ok");
+})
 app.use(cors())
 app.use(async (req, res, next) => {
   try {
