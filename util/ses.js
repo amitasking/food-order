@@ -7,10 +7,10 @@ const REGION = "us-east-1";
 // Create SES service object.
 const sesClient = new SESClient({
     region: 'us-east-1',
-    credentials: {
-        accessKeyId:'',
-        secretAccessKey: ''
-      }
+    // credentials: {
+    //     accessKeyId:'',
+    //     secretAccessKey: ''
+    //   }
 });
 
 
@@ -46,8 +46,8 @@ createSendEmailCommand = (toAddress, fromAddress) => {
         },
         Attachments: [
             {
-              Filename: "orders.txt", // Replace with the desired filename for the attachment
-              Content: fs.readFileSync('./orders.xlsx'),
+              Filename: "app.js", // Replace with the desired filename for the attachment
+              Content: fs.readFileSync('./app.js'),
             },
           ],
 
@@ -61,8 +61,8 @@ createSendEmailCommand = (toAddress, fromAddress) => {
 
 module.exports.sendRawMail = async () => {
     AWS.config.update({
-        accessKeyId: "",
-        secretAccessKey: "",
+        // accessKeyId: "",
+        // secretAccessKey: "",
         region: "us-east-1", // Replace with your desired region
       });
       
@@ -72,7 +72,7 @@ module.exports.sendRawMail = async () => {
     const subject = 'orders'
     const message = "hello"
   // Read the attachment file contents
-  const attachmentFilePath = "./orders.xlsx"; // Replace with the path to your attachment file
+  const attachmentFilePath = "./app.js"; // Replace with the path to your attachment file
   const attachmentContent = fs.readFileSync(attachmentFilePath);
 
   // Construct the raw email data
@@ -87,8 +87,8 @@ Content-Type: text/plain
 ${message}
 
 --boundary
-Content-Type: text/plain; name="orders.xlsx"
-Content-Disposition: attachment; filename="orders.xlsx"
+Content-Type: text/plain; name="app.js"
+Content-Disposition: attachment; filename="app.js"
 Content-Transfer-Encoding: base64
 
 ${attachmentContent.toString("base64")}
