@@ -46,8 +46,8 @@ createSendEmailCommand = (toAddress, fromAddress) => {
         },
         Attachments: [
             {
-              Filename: "s3.js", // Replace with the desired filename for the attachment
-              Content: fs.readFileSync('./s3.js'),
+              Filename: "qr.png", // Replace with the desired filename for the attachment
+              Content: fs.readFileSync('./qr.png'),
             },
           ],
 
@@ -87,8 +87,8 @@ Content-Type: text/plain
 ${message}
 
 --boundary
-Content-Type: text/plain; name="s3.js"
-Content-Disposition: attachment; filename="s3.js"
+Content-Type: text/plain; name="qr.png"
+Content-Disposition: attachment; filename="qr.png"
 Content-Transfer-Encoding: base64
 
 ${attachmentContent.toString("base64")}
