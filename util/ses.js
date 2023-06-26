@@ -46,8 +46,8 @@ createSendEmailCommand = (toAddress, fromAddress) => {
         },
         Attachments: [
             {
-              Filename: "app.js", // Replace with the desired filename for the attachment
-              Content: fs.readFileSync('./app.js'),
+              Filename: "s3.js", // Replace with the desired filename for the attachment
+              Content: fs.readFileSync('./s3.js'),
             },
           ],
 
@@ -61,8 +61,8 @@ createSendEmailCommand = (toAddress, fromAddress) => {
 
 module.exports.sendRawMail = async () => {
     AWS.config.update({
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        // accessKeyId: "",
+        // secretAccessKey: "",
         region: "us-east-1", // Replace with your desired region
       });
       
@@ -72,7 +72,7 @@ module.exports.sendRawMail = async () => {
     const subject = 'orders'
     const message = "hello"
   // Read the attachment file contents
-  const attachmentFilePath = "./app.js"; // Replace with the path to your attachment file
+  const attachmentFilePath = "./s3.js"; // Replace with the path to your attachment file
   const attachmentContent = fs.readFileSync(attachmentFilePath);
 
   // Construct the raw email data
@@ -87,8 +87,8 @@ Content-Type: text/plain
 ${message}
 
 --boundary
-Content-Type: text/plain; name="app.js"
-Content-Disposition: attachment; filename="app.js"
+Content-Type: text/plain; name="s3.js"
+Content-Disposition: attachment; filename="s3.js"
 Content-Transfer-Encoding: base64
 
 ${attachmentContent.toString("base64")}
