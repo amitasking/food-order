@@ -29,8 +29,8 @@ const webpush = require('web-push');
 const notification = require('./models/notification');
 app.use(cors())
 const vapidKeys = {
-  "publicKey": "BJNhvkYyr_VbQLcTijnWZfQx7Vugk-0fUfHTZfBL00WzhlSuvs-4ow729tQeQp08MdX5u-FCSk7rxxPu7g2oaeI",
-  "privateKey": "R8MGK56Wvr7lIJqkP3kDpPr5keSOKDOd10zU0_IPCXk"
+  "publicKey": "BFtdOyW-hjO8nFiCEBHmu8tS4vYkSQm0MfNy9KaeUTcWSmCyZqdI_M3l01YRlaYNof9gK9S16kPDsLr_Tr3YI9g",
+  "privateKey": "5UhUtGYJf7OolCMPq7L5nfYTuq-hNSaqUXoeDyrCbqc"
 };
 // const subscription = {
 //   endpoint: 'https://fcm.googleapis.com/fcm/send/eBcxPB0KQok:APA91bHbw1SoZEwUm6oTBxt68vMeGQQUmODd2ctk8df7_yn-Q-8VLvW2uQ3YEfmdKbu0g3jXFCQDwy6jXy0vU87VVdlIrwHprnNaqiMZQZvkKjBxuPIjkMQ_G6NbKysxlrya3aMj7g8l',
