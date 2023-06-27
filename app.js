@@ -13,6 +13,7 @@ const Order = require('./models/order');
 const FoodItem = require('./models/fooditem');
 const FoodType = require('./models/foodtype');
 const Organization = require('./models/organization');
+const Notification = require('./models/notification')
 // const subscription = {
 //   endpoint:
 //       'https://fcm.googleapis.com/fcm/send/eK13dggFkt4:APA91bEJFtI52ei4cRyJN2WpVo4g_JssRhR5Ye-K-EvME3nzsGgKdZ83bWCratCZWimgrEbLqUQ4rSQcrOkztArLW9Vx7A6azNFla_tX3LGA0djMNoM1iSlWyXHW65rs1HdpX-UK6dof',
@@ -25,51 +26,65 @@ const Organization = require('./models/organization');
 
 var app = express();
 const webpush = require('web-push');
+const notification = require('./models/notification');
 app.use(cors())
 const vapidKeys = {
   "publicKey": "BJNhvkYyr_VbQLcTijnWZfQx7Vugk-0fUfHTZfBL00WzhlSuvs-4ow729tQeQp08MdX5u-FCSk7rxxPu7g2oaeI",
   "privateKey": "R8MGK56Wvr7lIJqkP3kDpPr5keSOKDOd10zU0_IPCXk"
 };
+// const subscription = {
+//   endpoint: 'https://fcm.googleapis.com/fcm/send/eBcxPB0KQok:APA91bHbw1SoZEwUm6oTBxt68vMeGQQUmODd2ctk8df7_yn-Q-8VLvW2uQ3YEfmdKbu0g3jXFCQDwy6jXy0vU87VVdlIrwHprnNaqiMZQZvkKjBxuPIjkMQ_G6NbKysxlrya3aMj7g8l',
+//   expirationTime: null,
+//   keys: {
+//     auth: 'cS-qdSTc2YnOSl1A8gncCQ',
+//     p256dh: 'BDllT-41AaFaKCENKjtT2gPRF5qWv1vsYSrr9rb656gKGKNITMN9i-b58clZM8a1BPoCkUSZRNNxIDH6CPX0vUQ',
+//   },
+// };
 
-app.post('/api/notifications', (req, res) => {
-  console.log(req.body);
- // return res.send(req.body)
-  const subscription = {
-    endpoint: 'https://fcm.googleapis.com/fcm/send/fwb_w2ELz2M:APA91bGHlYXKMI2rJwxc_G94vMbh3Tyg0LVg_Vwd_OBbixaCtcpXuaMLa9qJnhuetptmHxyP51xrWv7E6JYLpdqycoVejM9sION8t2RNrwaiT6wrq9t3lYabhKF0wic4LJAloLU6fwT_',
-    expirationTime: null,
-    keys: {
-      auth: 'ETF8x_rzfrKiemn7toT8zw',
-      p256dh: 'BFgXCahPeaEro0vAwuJlpVoj08OZvBOtjouFACHu3iPK5muexUEOahQt9moVZh4cSh6oij8oajnLvuE_oVM3Kl4',
+const payload = {
+  notification: {
+    title: 'sdsd',
+    data: {
+      url: 'dsdsdsdsd'
     },
-  };
+  },
+};
 
-  const payload = {
-    notification: {
-      title: 'sdsd',
-      data: {
-        url :'dsdsdsdsd'
-      },
-    },
-  };
+const options = {
+  vapidDetails: {
+    subject: 'mailto:amit423raja@example.com',
+    publicKey: vapidKeys.publicKey,
+    privateKey: vapidKeys.privateKey,
+  },
+  TTL: 60,
+};
 
-  const options = {
-    vapidDetails: {
-      subject: 'mailto:amit423raja@example.com',
-      publicKey: vapidKeys.publicKey,
-      privateKey: vapidKeys.privateKey,
-    },
-    TTL: 60,
-  };
 
-  // send notification
-  webpush.sendNotification(subscription, JSON.stringify(payload), options)
-    .then((_) => {
-      console.log('SENT!!!');
-      console.log(_);
+app.post('/notification/send', (req, response, next) => {
+  notification.findAll().then(res => {
+    res.forEach(el => {
+      console.log(el);
+      const subscription = {
+        endpoint: el.endpoint,
+        expirationTime: null,
+        keys: {
+          p256dh: el.p256dh,
+          auth: el.auth,
+        },
+      };
+      webpush.sendNotification(subscription, JSON.stringify(payload), options)
+        .then((_) => {
+          console.log('SENT!!! to ' + JSON.stringify(subscription));
+          console.log(_);
+        })
+        .catch((_) => {
+          console.log(_);
+        });
     })
-    .catch((_) => {
-      console.log(_);
-    });
+    response.send(200)
+  }).catch(err => {
+    response.send(err)
+  });
 
 })
 const COGNITO_URL = `https://cognito-idp.us-east-1.amazonaws.com/`;
@@ -77,32 +92,32 @@ app.get('/health', (req, res, next) => {
   res.send("ok");
 })
 
-app.use(async (req, res, next) => {
-  try {
-    const accessToken = req.headers.authorization.split(" ")[1];
+// app.use(async (req, res, next) => {
+//   try {
+//     const accessToken = req.headers.authorization.split(" ")[1];
 
-    const { data } = await axios.post(
-      COGNITO_URL,
-      {
-        AccessToken: accessToken
-      },
-      {
-        headers: {
-          "Content-Type": "application/x-amz-json-1.1",
-          "X-Amz-Target": "AWSCognitoIdentityProviderService.GetUser"
-        }
-      }
-    )
+//     const { data } = await axios.post(
+//       COGNITO_URL,
+//       {
+//         AccessToken: accessToken
+//       },
+//       {
+//         headers: {
+//           "Content-Type": "application/x-amz-json-1.1",
+//           "X-Amz-Target": "AWSCognitoIdentityProviderService.GetUser"
+//         }
+//       }
+//     )
 
-    req.user = data.UserAttributes[2].Value
-    next();
-  } catch (error) {
-    console.log(error);
-    return res.status(401).json({
-      message: 'Auth failed'
-    });
-  }
-})
+//     req.user = data.UserAttributes[2].Value
+//     next();
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(401).json({
+//       message: 'Auth failed'
+//     });
+//   }
+// })
 
 seq.sync().then(result => {
   console.log(result);
@@ -113,6 +128,21 @@ seq.sync().then(result => {
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.post('/notification/register', (req, res, next) => {
+  // console.log(req.body.key);
+  notification.create({
+    endpoint: req.body.endpoint,
+    auth: req.body.keys.auth,
+    p256dh: req.body.keys.p256dh
+  }).then(result => {
+    res.send(result);
+  }).catch(err => {
+    res.send(err)
+  })
+
+
+})
 
 app.use('/order', orderRouter);
 app.use('/admin', adminRouter);
