@@ -24,6 +24,7 @@
     "otp-generator": "^4.0.1",
     "qrcode": "^1.5.1",
     "sequelize": "^6.31.0",
+    "web-push": "^3.6.3",
     "xlsx": "^0.18.5"
   }
 }
