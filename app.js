@@ -27,6 +27,9 @@ const Notification = require('./models/notification')
 var app = express();
 const webpush = require('web-push');
 const notification = require('./models/notification');
+app.options('/',cors())
+app.options('/notification',cors())
+app.options('/notification/send',cors())
 app.use(cors())
 const vapidKeys = {
   "publicKey": "BFtdOyW-hjO8nFiCEBHmu8tS4vYkSQm0MfNy9KaeUTcWSmCyZqdI_M3l01YRlaYNof9gK9S16kPDsLr_Tr3YI9g",
