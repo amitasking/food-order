@@ -28,7 +28,6 @@ exports.getfoodItems = (req, res, next) => {
             return res.send(result);
         })
     }
-
     else if (req.query.day) {
         // console.log("sendind data for day " + req.query.day);
         FoodItem.findAll({
@@ -40,8 +39,6 @@ exports.getfoodItems = (req, res, next) => {
             return res.send(result);
         })
     }
-
-
     else if (req.query.all) {
         FoodItem.findAll({
             where: {
@@ -51,7 +48,6 @@ exports.getfoodItems = (req, res, next) => {
             return res.send(result);
         })
     }
-
     else if (req.query.id){
         FoodItem.findOne({
             where: {
@@ -64,6 +60,8 @@ exports.getfoodItems = (req, res, next) => {
 }
 
 exports.addFoodItem = (req, res, next) => {
+    const user = req.user
+    const domain = user.split("@")[1] ? user.split("@")[1] : "";
 
     foodItem = FoodItem.create({
         OrganizationDomain: domain,

@@ -105,7 +105,7 @@ app.use(async (req, res, next) => {
 })
 
 seq.sync().then(result => {
-  console.log(result);
+  // console.log(result);
 }).catch(err => {
   console.log(err);
 })
@@ -124,7 +124,7 @@ Order.belongsTo(FoodItem, { constraints: true, onDelete: 'CASCADE' })
 FoodItem.belongsTo(FoodType, { constraints: true, onDelete: 'CASCADE' })
 FoodItem.belongsTo(Organization, { constraints: true, onDelete: 'CASCADE' })
 
-seq.sync({ force: true }).then(res => {
+seq.sync({ force: false }).then(res => {
 
   console.log(res);
   app.listen(4000)

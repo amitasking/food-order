@@ -1,7 +1,7 @@
 const Order = require("../models/order");
 const Organization = require("../models/organization");
 const FoodItem = require("../models/fooditem");
-const QRCode = require('qrcode');
+// const QRCode = require('qrcode');
 const fs = require('fs');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const excelExporter = require("../services/exportToExcel");
@@ -14,66 +14,58 @@ const {
 const PassThrough = require('stream');
 const { Blob } = require("buffer");
 
-/**
- * 
- * later add logic to get the cutoff time 
- * from organization and remove the hardcoded value
- */
 module.exports.saveOrder = (req, res, next) => {
     const user = req.user;
     const domain = user.split("@")[1] ? user.split("@")[1] : "";
-    const result = Organization.findOne({
+    let lunchCutOff;
+    let dinnerCutOff;
+    const currentDate = new Date();
+    const today = currentDate.getDay();
+    const currentHour = currentDate.getHours();
+    const currentMinutes = currentDate.getMinutes();
+    Organization.findOne({
         where: {
             domain: domain
-        },
-        include : {
-            all : true
         }
-    }).then(result => {
-        console.log(result);
-        return result;
-    })
-
-    const currentDateTime = new Date();
-    const currentHour = currentDateTime.getHours();
-    const foodItem = FoodItem.findOne({
-        where: {
-            id: req.body.FoodItemId
-        }
-    }).then(result => {
-        return result;
-    })
-    if (req.body.FoodItemId && foodItem.servedOn == new Date().getDay()) {
-      if ((foodItem.menuType == 'lunch' && currentHour < result.lunch_cutoff) || 
-      (foodItem.menuType == 'dinner' && currentHour < result.dinner_cutoff)){
-        console.log(req.body);
-        Order.create({
-            FoodItemId : req.body.FoodItemId,
-            name: foodItem.name,
-            date: new Date(),
-            empId: user
-        }).then(result => {
-            res.send(result)
-        }).catch(err => {
-            res.send(err)
+    }).then(org => {
+        lunchCutOff = org.lunch_cutoff.split(":");
+        dinnerCutOff = org.dinner_cutoff.split(":");
+        FoodItem.findOne({
+            where: {
+                id: req.body.foodItemId
+            }
+        }).then(foodItem => {
+            if (foodItem && domain === foodItem.OrganizationDomain) {
+              if ((foodItem.servedOn == today && foodItem.menuType == 'lunch' && (currentHour < lunchCutOff[0] || (currentHour === lunchCutOff[0] && currentMinutes <= lunchCutOff[1]))) || 
+              (foodItem.servedOn == today && foodItem.menuType == 'dinner' && (currentHour < dinnerCutOff[0] || (currentHour === dinnerCutOff[0] && currentMinutes <= dinnerCutOff[1]))) ||
+              (foodItem.servedOn != today)) {
+                Order.create({
+                    FoodItemId : req.body.foodItemId,
+                    name: foodItem.name,
+                    date: new Date(),
+                    empId: user
+                }).then(result => {
+                    return res.send(result)
+                }).catch(err => {
+                    return res.send(err)
+                })
+              }
+              else {
+                return res.send("Time out");
+              }
+            }
+            else{
+                return res.send("Food item not available");
+            }
         })
-      }
-        
-     
-      return false;
-    }
-    return true;
-  
-
-    
-
+    })
 }
 
 module.exports.fetchOrdersForUser = (req, res, next) => {
-    username = req.query.username
+    const user = req.user;
     Order.findAll({
         where: {
-            empId: req.query.username
+            empId: user
         },
         include : {
             all : true
@@ -109,51 +101,51 @@ module.exports.book = (req,res) => {
    res.send(otp)
 }
 
-module.exports.qrcode = async (req, res, next) => {
-    let name = Math.random() + 'qr.png'
-    QRCode.toFile(name, 'www.google.com', {
-        errorCorrectionLevel: 'H',
-    }, async function(err, url) {
-        console.log(url)
+// module.exports.qrcode = async (req, res, next) => {
+//     let name = Math.random() + 'qr.png'
+//     QRCode.toFile(name, 'www.google.com', {
+//         errorCorrectionLevel: 'H',
+//     }, async function(err, url) {
+//         console.log(url)
 
-        const f = fs.readFileSync(name)
-        const command = new PutObjectCommand({
-            Bucket: "food-order-orders",
-            Body: Buffer.from(buffer, 'base64'),
-            Key: name,
-        });
+//         const f = fs.readFileSync(name)
+//         const command = new PutObjectCommand({
+//             Bucket: "food-order-orders",
+//             Body: Buffer.from(buffer, 'base64'),
+//             Key: name,
+//         });
 
-        try {
-            const response = await client.send(command);
+//         try {
+//             const response = await client.send(command);
 
-            // const url = await getSignedUrl(client, command, { expiresIn: 3600 });
-             res.send(response);
-        } catch (err) {
-            console.error(err);
-        }
+//             // const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+//              res.send(response);
+//         } catch (err) {
+//             console.error(err);
+//         }
 
-    })
-}
+//     })
+// }
 
 
-module.exports.getQr = async(req,res,next) => {
+// module.exports.getQr = async(req,res,next) => {
    
-   const params = {
-      Bucket: "testbucketamitt",
-      Key: "download.png",
-      ResponseContentType: 'image/png'
-  };
+//    const params = {
+//       Bucket: "testbucketamitt",
+//       Key: "download.png",
+//       ResponseContentType: 'image/png'
+//   };
 
-  const readcommand = new GetObjectCommand(params);
-  try {
-   const response = await client.send(readcommand);
-   console.log("phunhc gya");
-   // The Body object also has 'transformToByteArray' and 'transformToWebStream' methods.
-   const str = await response.Body
-   const base64Data = btoa(String.fromCharCode(...new Uint8Array(response.Body)));
-   return res.send(base64Data);
- } catch (err) {
-   console.error(err);
- }
+//   const readcommand = new GetObjectCommand(params);
+//   try {
+//    const response = await client.send(readcommand);
+//    console.log("phunhc gya");
+//    // The Body object also has 'transformToByteArray' and 'transformToWebStream' methods.
+//    const str = await response.Body
+//    const base64Data = btoa(String.fromCharCode(...new Uint8Array(response.Body)));
+//    return res.send(base64Data);
+//  } catch (err) {
+//    console.error(err);
+//  }
  
-}
+//}

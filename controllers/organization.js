@@ -2,21 +2,14 @@ const Organization = require("../models/organization");
 
 
 module.exports.fetchOrganizations = (req, res, next) => {
-
-    Organization.findAll({
-        include : {
-            all : true
-        }
-    }).then(result => {
-        console.log(result);
+    Organization.findAll().then(result => {
         return res.send(result);
     })
-
 }
 
 module.exports.saveOrganization = (req, res, next) => {
-
-    console.log(req.body);
+    const user = req.user;
+    const domain = user.split("@")[1] ? user.split("@")[1] : "";
     Organization.create({
         domain : req.body.domain,
         lunch_cutoff: req.body.lunch_cutoff,
@@ -27,6 +20,5 @@ module.exports.saveOrganization = (req, res, next) => {
     }).catch(err => {
         res.send(err)
     })
-
 }
 

@@ -10,11 +10,11 @@ const Organization = seq.define('Organization', {
     },
 
     lunch_cutoff : {
-       type : DataTypes.TIME
+       type : DataTypes.STRING
     },
 
     dinner_cutoff : {
-        type : DataTypes.TIME
+        type : DataTypes.STRING
     },
 
     food_admin : {
