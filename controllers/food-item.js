@@ -64,7 +64,7 @@ exports.addFoodItem = (req, res, next) => {
     const domain = user.split("@")[1] ? user.split("@")[1] : "";
 
     foodItem = FoodItem.create({
-        OrganizationDomain: domain,
+        OrganizationDomain: req.body.domain,
         name: req.body.name,
         menuType: req.body.menuType,
         calories: req.body.calories,

@@ -51,11 +51,11 @@ module.exports.saveOrder = (req, res, next) => {
                 })
               }
               else {
-                return res.send("Time out");
+                return  res.status(403).send("Time out");
               }
             }
             else{
-                return res.send("Food item not available");
+                return res.status(404).send("Food item not available");
             }
         })
     })
@@ -87,8 +87,8 @@ module.exports.getAllOrders = (req, res, next) => {
     menuType = req.query.type
     domain = req.query.org
     Order.findAll({
-        include : {
-            all : true
+        where: {
+            date: new Date()
         },
         include: [{
             model: FoodItem,
@@ -97,7 +97,7 @@ module.exports.getAllOrders = (req, res, next) => {
           }]
     }).then(result => {
         res.send(result);
-        const date = new Date().getDate() + "-" + new Date().getMonth()
+        const date = new Date().getDate() + "-" + (new Date().getMonth() + 1);
         const filePath = `./${date}_${menuType}_${domain}_orders.xlsx`
      res.send(excelExporter.exportOrdersToExcel(result, workSheetColumnNames, filePath));
         return res.send(result);
