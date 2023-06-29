@@ -86,7 +86,7 @@ app.post('/notification/send', (req, response, next) => {
 
   const payload = {
     notification: {
-      title: `hello ${req.user}! ${req.body.notification}`,
+      title: `${req.body.notification}`,
       // data: {
       //   url: 'dsdsdsdsd'
       // },
