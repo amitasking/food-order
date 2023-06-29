@@ -11,10 +11,10 @@ const sesClient = new SESClient({
     //     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     //     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     // }
-      credentials: {
-            accessKeyId: '',
-            secretAccessKey: ""
-        }
+    credentials: {
+        accessKeyId: "",
+        secretAccessKey: "",
+    }
 
 });
 
@@ -51,10 +51,10 @@ createSendEmailCommand = (toAddress, fromAddress) => {
         },
         Attachments: [
             {
-              Filename: "qr.png", // Replace with the desired filename for the attachment
-              Content: fs.readFileSync('./qr.png'),
+                Filename: "qr.png", // Replace with the desired filename for the attachment
+                Content: fs.readFileSync('./qr.png'),
             },
-          ],
+        ],
 
         Source: fromAddress,
         ReplyToAddresses: [
@@ -64,24 +64,24 @@ createSendEmailCommand = (toAddress, fromAddress) => {
 };
 
 
-module.exports.sendRawMail = async () => {
+module.exports.sendRawMail = async (filePath,fileName) => {
     AWS.config.update({
-        // accessKeyId: "",
-        // secretAccessKey: "",
+        accessKeyId: "",
+        secretAccessKey: "",
         region: "us-east-1", // Replace with your desired region
-      });
-      
-    const ses2 = new AWS.SES();
-   const to = "amit423raja@gmail.com"
-   const from = "cu.17bcs1685@gmail.com"
-    const subject = 'orders'
-    const message = "hello"
-  // Read the attachment file contents
-  const attachmentFilePath = "./qr.png"; // Replace with the path to your attachment file
-  const attachmentContent = fs.readFileSync(attachmentFilePath);
+    });
 
-  // Construct the raw email data
-  const rawEmail = `From: ${from}
+    const ses2 = new AWS.SES();
+    const to = "amit423raja@gmail.com"
+    const from = "cu.17bcs1685@gmail.com"
+    const subject = 'orders'
+    const message = "hello here are your orders"
+    // Read the attachment file contents
+    const attachmentFilePath = filePath; // Replace with the path to your attachment file
+    const attachmentContent = fs.readFileSync(attachmentFilePath);
+
+    // Construct the raw email data
+    const rawEmail = `From: ${from}
 To: ${to}
 Subject: ${subject}
 Content-Type: multipart/mixed; boundary="boundary"
@@ -92,20 +92,20 @@ Content-Type: text/plain
 ${message}
 
 --boundary
-Content-Type: text/plain; name="qr.png"
-Content-Disposition: attachment; filename="qr.png"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; name=${fileName}
+Content-Disposition: attachment; filename=${fileName}
 Content-Transfer-Encoding: base64
 
 ${attachmentContent.toString("base64")}
 
 --boundary--`;
 
-  // Set the parameters for the SES SendRawEmail operation
-  const params = {
-    RawMessage: {
-      Data: rawEmail,
-    },
-  };
+    // Set the parameters for the SES SendRawEmail operation
+    const params = {
+        RawMessage: {
+            Data: rawEmail,
+        },
+    };
 
 
 
@@ -148,11 +148,11 @@ ${attachmentContent.toString("base64")}
     //     },
     //   };
 
-      await ses2.sendRawEmail(params).promise().then(re => {
+    await ses2.sendRawEmail(params).promise().then(re => {
 
-          return ("Email sent successfully");
-      });
-  
+        return ("Email sent successfully");
+    });
+
 }
 
 

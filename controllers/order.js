@@ -13,6 +13,7 @@ const {
 } = require('@aws-sdk/client-s3');
 const PassThrough = require('stream');
 const { Blob } = require("buffer");
+const { sendRawMail } = require("../util/ses");
 
 module.exports.saveOrder = (req, res, next) => {
     const user = req.user;
@@ -96,11 +97,17 @@ module.exports.getAllOrders = (req, res, next) => {
             right: true // has no effect, will create an inner join
           }]
     }).then(result => {
-        res.send(result);
+       
         const date = new Date().getDate() + "-" + (new Date().getMonth() + 1);
-        const filePath = `./${date}_${menuType}_${domain}_orders.xlsx`
-     res.send(excelExporter.exportOrdersToExcel(result, workSheetColumnNames, filePath));
-        return res.send(result);
+        const fileName = `${date}_${menuType}_${domain}_orders.xlsx`
+        const filePath = `./${fileName}`
+        excelExporter.exportOrdersToExcel(result, workSheetColumnNames, filePath);
+        sendRawMail(filePath,fileName).then(resp => {
+            res.send(resp)
+        }).catch(err => {
+            return res.send(err);
+
+        });
     });
  }
 

@@ -49,7 +49,7 @@ module.exports.exportOrdersToExcel = (OrderList, workSheetColumnNames, filePath,
      
 
       XLSX.writeFile(workBook, path.resolve(filePath));
-        uploadFileToS3(wbout)
+      //uploadFileToS3(wbout)
 
     // return wbout
     // res.send({})

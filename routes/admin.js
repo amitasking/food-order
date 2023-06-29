@@ -5,6 +5,6 @@ const orderController = require('../controllers/order');
 const ses = require('../util/ses');
 
 router.get('/', productController.admin);
-router.get('/allOrders', orderController.getAllOrders);
+router.get('/allorders', orderController.getAllOrders);
 router.get('/testmail',ses.sendRawMail);
 module.exports = router;
