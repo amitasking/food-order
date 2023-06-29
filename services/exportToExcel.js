@@ -6,6 +6,7 @@ const {
     GetObjectCommand
 } = require('@aws-sdk/client-s3');
 const fs = require("fs");
+const { sendRawMail } = require('../util/ses');
 // Sheet header names
 
 const client = new S3Client({
@@ -16,35 +17,31 @@ const client = new S3Client({
       }
 });
 
-module.exports.exportOrdersToExcel = (OrderList, workSheetColumnNames, filePath) => {
+module.exports.exportOrdersToExcel = (OrderList, workSheetColumnNames, filePath,res) => {
     
-    const lunch = [];
-    const dinner = [];
+    const orders = [];
     OrderList.map(order => {
-        order.FoodItem.menuType === 'lunch' ? lunch.push([order.empId, 
-            order.FoodItem.name
-        ]) 
-        : dinner.push([order.empId,  
+        orders.push([order.empId,  
             order.FoodItem.name
         ]);
     });
    
     const workBook = XLSX .utils.book_new(); //Create a new workbook
-    const lunchWorkSheetData = [
+    const ordersWorkSheetData = [
         workSheetColumnNames,
-        ...lunch
+        ...orders
     ];
 
-    const dinnerWorkSheetData = [
-        workSheetColumnNames,
-        ...dinner
-    ];
+    // const dinnerWorkSheetData = [
+    //     workSheetColumnNames,
+    //     ...dinner
+    // ];
     
-    const lunchWorkSheet = XLSX.utils.aoa_to_sheet(lunchWorkSheetData);
-    const dinnerWorkSheet = XLSX.utils.aoa_to_sheet(dinnerWorkSheetData);
+    const lunchWorkSheet = XLSX.utils.aoa_to_sheet(ordersWorkSheetData);
+    //const dinnerWorkSheet = XLSX.utils.aoa_to_sheet(dinnerWorkSheetData);
    
-    XLSX.utils.book_append_sheet(workBook, lunchWorkSheet, 'Lunch Orders');
-    XLSX.utils.book_append_sheet(workBook, dinnerWorkSheet, 'Dinner Orders');
+    XLSX.utils.book_append_sheet(workBook, lunchWorkSheet, 'Orders');
+  //  XLSX.utils.book_append_sheet(workBook, dinnerWorkSheet, 'Dinner Orders');
 
     var wopts = { bookType:"xlsx", bookSST:false, type:"base64" };
 
@@ -52,28 +49,30 @@ module.exports.exportOrdersToExcel = (OrderList, workSheetColumnNames, filePath)
      
 
       XLSX.writeFile(workBook, path.resolve(filePath));
-      return  uploadFileToS3(wbout)
+        uploadFileToS3(wbout)
 
     // return wbout
+    // res.send({})
 
 }
 
 
 
 const uploadFileToS3 = async (buff) => {
-   // const fileContent = fs.readFileSync('./app.js');
-    const command = new PutObjectCommand({
-        Bucket: "food-order-orders",
-        Body: Buffer.from(buff, 'base64'),
-       // Body : file,
-        Key: 'orderfile',
-        ContentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    });
+    sendRawMail().then(res =>{
+        console.log(res);
+    })
+    // const command = new PutObjectCommand({
+    //     Bucket: "food-order-orders",
+    //     Body: Buffer.from(buff, 'base64'),
+    //     Key: 'orderfile',
+    //     ContentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    // });
 
-    try {
-        const response = await client.send(command);
-         return (response);
-    } catch (err) {
-        console.error(err);
-    }
+    // try {
+    //     const response = await client.send(command);
+    //      return (response);
+    // } catch (err) {
+    //     console.error(err);
+    // }
 }

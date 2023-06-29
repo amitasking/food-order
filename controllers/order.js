@@ -78,20 +78,29 @@ module.exports.fetchOrdersForUser = (req, res, next) => {
 }
 
 const workSheetColumnNames = [
-    "Employee Id",
+    "User ",
     "Name"
 ];
-const filePath = './orders.xlsx';
+// const filePath = './orders.xlsx';
 
 module.exports.getAllOrders = (req, res, next) => {
+    menuType = req.query.type
+    domain = req.query.org
     Order.findAll({
         include : {
             all : true
-        }
+        },
+        include: [{
+            model: FoodItem,
+            where: { menuType:  menuType,OrganizationDomain:domain },
+            right: true // has no effect, will create an inner join
+          }]
     }).then(result => {
-        console.log(result);
-        return res.send(excelExporter.exportOrdersToExcel(result, workSheetColumnNames, filePath));
-       // return res.send(result);
+        res.send(result);
+        const date = new Date().getDate() + "-" + new Date().getMonth()
+        const filePath = `./${date}_${menuType}_${domain}_orders.xlsx`
+     res.send(excelExporter.exportOrdersToExcel(result, workSheetColumnNames, filePath));
+        return res.send(result);
     });
  }
 

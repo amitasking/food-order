@@ -32,8 +32,8 @@ app.options('/notification',cors())
 app.options('/notification/send',cors())
 app.use(cors())
 const vapidKeys = {
-  "publicKey": "BFtdOyW-hjO8nFiCEBHmu8tS4vYkSQm0MfNy9KaeUTcWSmCyZqdI_M3l01YRlaYNof9gK9S16kPDsLr_Tr3YI9g",
-  "privateKey": "5UhUtGYJf7OolCMPq7L5nfYTuq-hNSaqUXoeDyrCbqc"
+  "publicKey": "BEsCP3dcYVdKyd8W3NpkbFETW6zi66ZpgO8RBJHOhR2LiFtePJyFBpauZ_3bLa1g7R4gG95UZ9U_-uBw8o7zKHY",
+  "privateKey": "RIHekHJtB0RGCuYamBIdlNS6EXGxCUYX1g-SgiIvCjg"
 };
 // const subscription = {
 //   endpoint: 'https://fcm.googleapis.com/fcm/send/eBcxPB0KQok:APA91bHbw1SoZEwUm6oTBxt68vMeGQQUmODd2ctk8df7_yn-Q-8VLvW2uQ3YEfmdKbu0g3jXFCQDwy6jXy0vU87VVdlIrwHprnNaqiMZQZvkKjBxuPIjkMQ_G6NbKysxlrya3aMj7g8l',
