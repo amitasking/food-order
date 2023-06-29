@@ -27,6 +27,9 @@ const Notification = require('./models/notification')
 var app = express();
 const webpush = require('web-push');
 const notification = require('./models/notification');
+app.get('/health', (req, res, next) => {
+  res.send("ok");
+})
 
 
 app.use(logger('dev'));
@@ -117,9 +120,6 @@ app.post('/notification/send', (req, response, next) => {
 
 })
 const COGNITO_URL = `https://cognito-idp.us-east-1.amazonaws.com/`;
-app.get('/health', (req, res, next) => {
-  res.send("ok");
-})
 
 
 seq.sync().then(result => {
