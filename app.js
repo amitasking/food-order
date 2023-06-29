@@ -27,35 +27,18 @@ const Notification = require('./models/notification')
 var app = express();
 const webpush = require('web-push');
 const notification = require('./models/notification');
-app.options('/',cors())
-app.options('/notification',cors())
-app.options('/notification/send',cors())
+app.options('/', cors())
+app.options('/notification', cors())
+app.options('/notification/send', cors())
 app.use(cors())
 const vapidKeys = {
   "publicKey": "BEsCP3dcYVdKyd8W3NpkbFETW6zi66ZpgO8RBJHOhR2LiFtePJyFBpauZ_3bLa1g7R4gG95UZ9U_-uBw8o7zKHY",
   "privateKey": "RIHekHJtB0RGCuYamBIdlNS6EXGxCUYX1g-SgiIvCjg"
 };
-// const subscription = {
-//   endpoint: 'https://fcm.googleapis.com/fcm/send/eBcxPB0KQok:APA91bHbw1SoZEwUm6oTBxt68vMeGQQUmODd2ctk8df7_yn-Q-8VLvW2uQ3YEfmdKbu0g3jXFCQDwy6jXy0vU87VVdlIrwHprnNaqiMZQZvkKjBxuPIjkMQ_G6NbKysxlrya3aMj7g8l',
-//   expirationTime: null,
-//   keys: {
-//     auth: 'cS-qdSTc2YnOSl1A8gncCQ',
-//     p256dh: 'BDllT-41AaFaKCENKjtT2gPRF5qWv1vsYSrr9rb656gKGKNITMN9i-b58clZM8a1BPoCkUSZRNNxIDH6CPX0vUQ',
-//   },
-// };
-
-const payload = {
-  notification: {
-    title: 'sdsd',
-    data: {
-      url: 'dsdsdsdsd'
-    },
-  },
-};
 
 const options = {
   vapidDetails: {
-    subject: 'mailto:amit423raja@example.com',
+    subject: 'mailto:amit423raja@gmail.com',
     publicKey: vapidKeys.publicKey,
     privateKey: vapidKeys.privateKey,
   },
@@ -64,6 +47,16 @@ const options = {
 
 
 app.post('/notification/send', (req, response, next) => {
+
+  const payload = {
+    notification: {
+      title: req.body.notification,
+      // data: {
+      //   url: 'dsdsdsdsd'
+      // },
+    },
+  };
+
   notification.findAll().then(res => {
     res.forEach(el => {
       console.log(el);
