@@ -27,6 +27,12 @@ const Notification = require('./models/notification')
 var app = express();
 const webpush = require('web-push');
 const notification = require('./models/notification');
+
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
 app.options('/', cors())
 app.options('/notification', cors())
 app.options('/notification/send', cors())
@@ -120,10 +126,6 @@ seq.sync().then(result => {
 }).catch(err => {
   console.log(err);
 })
-
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
 app.post('/notification/register', (req, res, next) => {
   // console.log(req.body.key);
