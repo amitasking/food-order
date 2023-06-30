@@ -5,6 +5,12 @@ const FoodItem = require("../models/fooditem");
 const fs = require('fs');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const excelExporter = require("../services/exportToExcel");
+const moment = require('moment-timezone');
+
+// Get the current date in the Indian time zone
+
+
+// Output the current day, hours, and minutes
 
 const {
     S3Client,
@@ -15,16 +21,26 @@ const PassThrough = require('stream');
 const { Blob } = require("buffer");
 const { sendRawMail } = require("../util/ses");
 const {  Op } = require("sequelize");
+const { log } = require("console");
 
 module.exports.saveOrder = (req, res, next) => {
     const user = req.user;
     const domain = user.split("@")[1] ? user.split("@")[1] : "";
     let lunchCutOff;
     let dinnerCutOff;
-    const currentDate = new Date();
-    const today = currentDate.getDay();
-    const currentHour = currentDate.getHours();
-    const currentMinutes = currentDate.getMinutes();
+
+    const indianDateTime = moment().tz('Asia/Kolkata').format();
+
+const today = new Date(indianDateTime).getDay();
+const currentHour =  new Date(indianDateTime).getHours();
+const currentMinutes =  new Date(indianDateTime).getMinutes();
+
+
+
+    // const currentDate = new Date();
+    // const today = currentDate.getDay();
+    // const currentHour = currentDate.getHours();
+    // const currentMinutes = currentDate.getMinutes();
     Organization.findOne({
         where: {
             domain: domain
