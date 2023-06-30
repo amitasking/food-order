@@ -88,6 +88,7 @@ const workSheetColumnNames = [
 module.exports.getAllOrders = (req, res, next) => {
     menuType = req.query.type
     domain = req.query.org
+    toMail = req.query.toMail
     currentDate = new Date();
     Order.findAll({
         // where: {
@@ -99,7 +100,8 @@ module.exports.getAllOrders = (req, res, next) => {
             model: FoodItem,
             where: { menuType:  menuType,
                     OrganizationDomain:domain,
-                    servedOn: currentDate.getDay() },
+                    //servedOn: currentDate.getDay()
+                 },
             right: true // has no effect, will create an inner join
           }]
     }).then(result => {
@@ -111,7 +113,7 @@ module.exports.getAllOrders = (req, res, next) => {
         const fileName = `${date}_${menuType}_${domain}_orders.xlsx`
         const filePath = `./${fileName}`
         excelExporter.exportOrdersToExcel(result, workSheetColumnNames, filePath);
-        sendRawMail(filePath,fileName).then(resp => {
+        sendRawMail(filePath,fileName,toMail).then(resp => {
             res.send(resp)
         }).catch(err => {
             return res.send(err);
