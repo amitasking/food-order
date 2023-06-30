@@ -9,7 +9,8 @@ const { Sequelize } = require('sequelize');
 const seq = new Sequelize('foodorder', 'root', '423Raja@@', {
     host: 'localhost',
     dialect: 'mysql',
-    logging : false
+    logging : false,
+    //useUTC: false
   });
   
 

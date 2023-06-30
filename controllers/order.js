@@ -14,6 +14,7 @@ const {
 const PassThrough = require('stream');
 const { Blob } = require("buffer");
 const { sendRawMail } = require("../util/ses");
+const {  Op } = require("sequelize");
 
 module.exports.saveOrder = (req, res, next) => {
     const user = req.user;
@@ -43,7 +44,7 @@ module.exports.saveOrder = (req, res, next) => {
                 Order.create({
                     FoodItemId : req.body.foodItemId,
                     name: foodItem.name,
-                    date: new Date(),
+                    date: new Date().toLocaleString(),
                     empId: user
                 }).then(result => {
                     return res.send(result)
@@ -52,7 +53,7 @@ module.exports.saveOrder = (req, res, next) => {
                 })
               }
               else {
-                return  res.status(403).send("Time out");
+                return  res.status(403).send("Booking time for this food item is over now");
               }
             }
             else{
@@ -87,16 +88,24 @@ const workSheetColumnNames = [
 module.exports.getAllOrders = (req, res, next) => {
     menuType = req.query.type
     domain = req.query.org
+    currentDate = new Date();
     Order.findAll({
-        where: {
-            date: new Date()
-        },
+        // where: {
+        //     date: {
+        //         [Op.like]:  `%${currentDate.split(",")[0]}%`
+        //     }
+        // },
         include: [{
             model: FoodItem,
-            where: { menuType:  menuType,OrganizationDomain:domain },
+            where: { menuType:  menuType,
+                    OrganizationDomain:domain,
+                    servedOn: currentDate.getDay() },
             right: true // has no effect, will create an inner join
           }]
     }).then(result => {
+        if(result.length == 0){
+            res.status(203).send("No orders found.")
+        }
        
         const date = new Date().getDate() + "-" + (new Date().getMonth() + 1);
         const fileName = `${date}_${menuType}_${domain}_orders.xlsx`

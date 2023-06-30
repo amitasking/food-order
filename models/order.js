@@ -10,7 +10,7 @@ const Order = seq.define('Order', {
     },
 
     date : {
-        type : Sequelize.DATE
+        type : Sequelize.STRING
     }
     ,
 
