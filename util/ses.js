@@ -12,8 +12,8 @@ const sesClient = new SESClient({
     //     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     // }
     credentials: {
-        accessKeyId: "",
-        secretAccessKey: "",
+        accessKeyId: "AKIATE47YOWIDV6BVPOA",
+        secretAccessKey: "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",
     }
 
 });
@@ -64,15 +64,15 @@ createSendEmailCommand = (toAddress, fromAddress) => {
 };
 
 
-module.exports.sendRawMail = async (filePath,fileName) => {
+module.exports.sendRawMail = async (filePath,fileName,toMail) => {
     AWS.config.update({
-        accessKeyId: "",
-        secretAccessKey: "",
+        accessKeyId: "AKIATE47YOWIDV6BVPOA",
+        secretAccessKey: "t+J0tmGxdejQdeUduxjkDsBLKBrHNe1RJ7Ghy/do",
         region: "us-east-1", // Replace with your desired region
     });
 
     const ses2 = new AWS.SES();
-    const to = "amit423raja@gmail.com"
+    const to = toMail
     const from = "cu.17bcs1685@gmail.com"
     const subject = 'orders'
     const message = "hello here are your orders"

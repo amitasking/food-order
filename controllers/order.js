@@ -5,6 +5,12 @@ const FoodItem = require("../models/fooditem");
 const fs = require('fs');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const excelExporter = require("../services/exportToExcel");
+const moment = require('moment-timezone');
+
+// Get the current date in the Indian time zone
+
+
+// Output the current day, hours, and minutes
 
 const {
     S3Client,
@@ -15,16 +21,26 @@ const PassThrough = require('stream');
 const { Blob } = require("buffer");
 const { sendRawMail } = require("../util/ses");
 const {  Op } = require("sequelize");
+const { log } = require("console");
 
 module.exports.saveOrder = (req, res, next) => {
     const user = req.user;
     const domain = user.split("@")[1] ? user.split("@")[1] : "";
     let lunchCutOff;
     let dinnerCutOff;
-    const currentDate = new Date();
-    const today = currentDate.getDay();
-    const currentHour = currentDate.getHours();
-    const currentMinutes = currentDate.getMinutes();
+
+    const indianDateTime = moment().tz('Asia/Kolkata').format();
+
+const today = new Date(indianDateTime).getDay();
+const currentHour =  new Date(indianDateTime).getHours();
+const currentMinutes =  new Date(indianDateTime).getMinutes();
+
+
+
+    // const currentDate = new Date();
+    // const today = currentDate.getDay();
+    // const currentHour = currentDate.getHours();
+    // const currentMinutes = currentDate.getMinutes();
     Organization.findOne({
         where: {
             domain: domain
@@ -88,6 +104,7 @@ const workSheetColumnNames = [
 module.exports.getAllOrders = (req, res, next) => {
     menuType = req.query.type
     domain = req.query.org
+    toMail = req.query.toMail
     currentDate = new Date();
     Order.findAll({
         // where: {
@@ -99,7 +116,8 @@ module.exports.getAllOrders = (req, res, next) => {
             model: FoodItem,
             where: { menuType:  menuType,
                     OrganizationDomain:domain,
-                    servedOn: currentDate.getDay() },
+                    //servedOn: currentDate.getDay()
+                 },
             right: true // has no effect, will create an inner join
           }]
     }).then(result => {
@@ -111,7 +129,7 @@ module.exports.getAllOrders = (req, res, next) => {
         const fileName = `${date}_${menuType}_${domain}_orders.xlsx`
         const filePath = `./${fileName}`
         excelExporter.exportOrdersToExcel(result, workSheetColumnNames, filePath);
-        sendRawMail(filePath,fileName).then(resp => {
+        sendRawMail(filePath,fileName,toMail).then(resp => {
             res.send(resp)
         }).catch(err => {
             return res.send(err);
