@@ -6,11 +6,8 @@ const fs = require('fs');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const excelExporter = require("../services/exportToExcel");
 const moment = require('moment-timezone');
-
-// Get the current date in the Indian time zone
-
-
-// Output the current day, hours, and minutes
+const orderStatus = require('../services/orderStatus');
+//const moment = require('moment');
 
 const {
     S3Client,
@@ -29,18 +26,22 @@ module.exports.saveOrder = (req, res, next) => {
     let lunchCutOff;
     let dinnerCutOff;
 
-    const indianDateTime = moment().tz('Asia/Kolkata').format();
+    // const indianDateTime = momentTz().tz('Asia/Kolkata').format();
+    // console.log(indianDateTime);
 
-const today = new Date(indianDateTime).getDay();
-const currentHour =  new Date(indianDateTime).getHours();
-const currentMinutes =  new Date(indianDateTime).getMinutes();
+    // const today = new Date(indianDateTime).getDay();
+    // const currentHour =  new Date(indianDateTime).getHours();
+    // const currentMinutes =  new Date(indianDateTime).getMinutes();
+    const currentDate = moment();
+    currentDate.tz('Asia/Kolkata');
+    // const currentDate = today.local().format();
+    //console.log(today);
+    console.log(currentDate);
 
-
-
-    // const currentDate = new Date();
-    // const today = currentDate.getDay();
-    // const currentHour = currentDate.getHours();
-    // const currentMinutes = currentDate.getMinutes();
+    const currentHour = today.hours();
+    console.log(currentHour);
+    const currentMinutes = today.minutes();
+    console.log(currentMinutes);
     Organization.findOne({
         where: {
             domain: domain
@@ -53,17 +54,26 @@ const currentMinutes =  new Date(indianDateTime).getMinutes();
                 id: req.body.foodItemId
             }
         }).then(foodItem => {
+            console.log(foodItem.date);
+            console.log(currentDate);
+            const specificDate = moment('2023-07-12', 'YYYY-MM-DD').tz('Asia/Kolkata');
             if (foodItem && domain === foodItem.OrganizationDomain) {
-              if ((foodItem.servedOn == today && foodItem.menuType == 'lunch' && (currentHour < lunchCutOff[0] || (currentHour === lunchCutOff[0] && currentMinutes <= lunchCutOff[1]))) || 
-              (foodItem.servedOn == today && foodItem.menuType == 'dinner' && (currentHour < dinnerCutOff[0] || (currentHour === dinnerCutOff[0] && currentMinutes <= dinnerCutOff[1]))) ||
-              (foodItem.servedOn != today)) {
+              if ((date.trim("T")[0] == currentDate.trim("T")[0] && foodItem.menuType == 'lunch' && (currentHour < lunchCutOff[0] || (currentHour === lunchCutOff[0] && currentMinutes <= lunchCutOff[1]))) || 
+              (date == currentDate && foodItem.menuType == 'dinner' && (currentHour < dinnerCutOff[0] || (currentHour === dinnerCutOff[0] && currentMinutes <= dinnerCutOff[1]))) ||
+              (date > currentDate)) {
+                const otp = this.book();
+                console.log(otp);
                 Order.create({
                     FoodItemId : req.body.foodItemId,
                     name: foodItem.name,
-                    date: new Date().toLocaleString(),
-                    empId: user
+                    date: moment(new Date()),
+                    empId: user,
+                    otp: otp,
+                    status: orderStatus.PENDING,
+                    OrganizationDomain: domain
                 }).then(result => {
-                    return res.send(result)
+                    console.log(result);
+                    return res.send(result);
                 }).catch(err => {
                     return res.send(err)
                 })
@@ -138,10 +148,10 @@ module.exports.getAllOrders = (req, res, next) => {
     });
  }
 
-module.exports.book = (req,res) => {
+module.exports.book = () => {
    const otpGenerator = require('otp-generator')
    const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
-   res.send(otp)
+   return otp;
 }
 
 // module.exports.qrcode = async (req, res, next) => {

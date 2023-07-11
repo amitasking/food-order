@@ -10,7 +10,16 @@ const Order = seq.define('Order', {
     },
 
     date : {
-        type : Sequelize.STRING
+        type : Sequelize.DATE,
+        allowNull: false,
+        get() {
+        const originalTime = this.getDataValue('date');
+        if (originalTime) {
+            const timeZone = 'Asia/Kolkata'; // Set the desired time zone here
+            return moment(originalTime).tz(timeZone).format();
+        }
+        return null;
+        },
     }
     ,
 
@@ -20,6 +29,15 @@ const Order = seq.define('Order', {
     ,
     type : {
         type : Sequelize.STRING
+    },
+    otp : {
+        type : Sequelize.STRING
+    },
+    status : {
+        type : Sequelize.STRING
     }
+}, {
+    //timestamps: false, // Disable timestamps if not needed
+    timezone: '+05:30', // Set the desired time zone here
 });
 module.exports = Order

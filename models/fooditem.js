@@ -1,5 +1,6 @@
 const {Sequelize} = require('sequelize');
-const seq = require('../util/database')
+const seq = require('../util/database');
+const moment = require('moment-timezone');
 
 const FoodItem = seq.define('FoodItem', {
     id : {
@@ -35,6 +36,21 @@ const FoodItem = seq.define('FoodItem', {
     },
     servedOn : {
         type : Sequelize.INTEGER
+    },
+    date : {
+        type : Sequelize.DATE,
+        allowNull: false,
+        get() {
+        const originalTime = this.getDataValue('date');
+        if (originalTime) {
+            const timeZone = 'Asia/Kolkata'; // Set the desired time zone here
+            return moment(originalTime).tz(timeZone).format();
+        }
+        return null;
+        },
     }
+}, {
+    //timestamps: false, // Disable timestamps if not needed
+    timezone: '+05:30', // Set the desired time zone here
 });
 module.exports = FoodItem

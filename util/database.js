@@ -10,6 +10,16 @@ const seq = new Sequelize('foodorder', 'root', '423Raja@@', {
     host: 'localhost',
     dialect: 'mysql',
     logging : false,
+    dialectOptions: {
+      dateStrings: true,
+      typeCast: function (field, next) {
+        if (field.type === 'DATETIME') {
+          return field.string();
+        }
+        return next();
+      },
+    },
+    timezone: '+05:30'
     //useUTC: false
   });
   
