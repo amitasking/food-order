@@ -1,43 +1,38 @@
 const { where } = require("sequelize");
 const FoodItem = require("../models/fooditem");
+const moment = require('moment');
 
 exports.getfoodItems = (req, res, next) => {
     //res.send(req.user);
     const user = req.user
     const domain = user.split("@")[1] ? user.split("@")[1] : "";
     
-    if (req.query.day && req.query.type) {
-        console.log("sendind data for day " + req.query.day);
-        FoodItem.findAll({
+    if (req.query.date) {
+        const lunchFoods = FoodItem.findAll({
             where: {
-                servedOn: req.query.day,
-                menuType: req.query.type,
-                OrganizationDomain: domain
-            }
-        }).then(result => {
-            return res.send(result);
-        })
-    }
-    else if (req.query.type) {
-        FoodItem.findAll({
+                date: req.query.date,
+                OrganizationDomain: domain,
+                menuType: "lunch"
+            },
+          });
+          
+        const dinnerFoods = FoodItem.findAll({
             where: {
-                menuType: req.query.type,
-                OrganizationDomain: domain
+                date: req.query.date,
+                OrganizationDomain: domain,
+                menuType: "dinner"
+            },
+        });
+        
+        Promise.all([lunchFoods, dinnerFoods])
+            .then(results => {
+                const [lunch, dinner] = results;
+                return res.send({lunch, dinner});
+            })
+            .catch(error => {
+                console.error(error);
             }
-        }).then(result => {
-            return res.send(result);
-        })
-    }
-    else if (req.query.day) {
-        // console.log("sendind data for day " + req.query.day);
-        FoodItem.findAll({
-            where: {
-                servedOn: req.query.day,
-                OrganizationDomain: domain
-            }
-        }).then(result => {
-            return res.send(result);
-        })
+        );
     }
     else if (req.query.all) {
         FoodItem.findAll({
@@ -54,6 +49,7 @@ exports.getfoodItems = (req, res, next) => {
                 id: req.query.id
             }
         }).then(result => {
+            //result.date = moment(date).local();
             return res.send(result);
         })
     }
@@ -62,6 +58,11 @@ exports.getfoodItems = (req, res, next) => {
 exports.addFoodItem = (req, res, next) => {
     const user = req.user
     const domain = user.split("@")[1] ? user.split("@")[1] : "";
+    const date = moment(req.body.date).local().date();
+    const currentDate = moment().local().date();
+    if(date < currentDate){
+        return res.status(400).send("Food addition window is closed for this time. Please try for some other time");
+    }
 
     foodItem = FoodItem.create({
         OrganizationDomain: req.body.domain,
@@ -72,7 +73,8 @@ exports.addFoodItem = (req, res, next) => {
         carbs: req.body.carbs,
         image: req.body.image,
         description: req.body.description,
-        servedOn: req.body.servedOn
+        servedOn: req.body.servedOn,
+        date: moment(req.body.date)
     }).then(result => {
         res.send(result);
     }).catch(err => {
