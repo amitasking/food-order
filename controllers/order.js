@@ -2,158 +2,159 @@ const Order = require("../models/order");
 const Organization = require("../models/organization");
 const FoodItem = require("../models/fooditem");
 // const QRCode = require('qrcode');
-const fs = require('fs');
-const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const fs = require("fs");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const excelExporter = require("../services/exportToExcel");
-const moment = require('moment-timezone');
-const orderStatus = require('../services/orderStatus');
+const moment = require("moment-timezone");
+const orderStatus = require("../services/orderStatus");
 //const moment = require('moment');
 
 const {
-    S3Client,
-    PutObjectCommand,
-    GetObjectCommand
-} = require('@aws-sdk/client-s3');
-const PassThrough = require('stream');
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} = require("@aws-sdk/client-s3");
+const PassThrough = require("stream");
 const { Blob } = require("buffer");
 const { sendRawMail } = require("../util/ses");
-const {  Op } = require("sequelize");
+const { Op } = require("sequelize");
 const { log } = require("console");
 
 module.exports.saveOrder = (req, res, next) => {
-    const user = req.user;
-    const domain = user.split("@")[1] ? user.split("@")[1] : "";
-    let lunchCutOff;
-    let dinnerCutOff;
+  const user = req.user;
+  const domain = user.split("@")[1] ? user.split("@")[1] : "";
+  let lunchCutOff;
+  let dinnerCutOff;
 
-    // const indianDateTime = momentTz().tz('Asia/Kolkata').format();
-    // console.log(indianDateTime);
-
-    // const today = new Date(indianDateTime).getDay();
-    // const currentHour =  new Date(indianDateTime).getHours();
-    // const currentMinutes =  new Date(indianDateTime).getMinutes();
-    const currentDate = moment();
-    currentDate.tz('Asia/Kolkata');
-    // const currentDate = today.local().format();
-    //console.log(today);
-    console.log(currentDate);
-
-    const currentHour = today.hours();
-    console.log(currentHour);
-    const currentMinutes = today.minutes();
-    console.log(currentMinutes);
-    Organization.findOne({
-        where: {
-            domain: domain
+  const currentDate = moment().tz("Asia/Kolkata");
+  const currentHour = currentDate.hours();
+  const currentMinutes = currentDate.minutes();
+  currentDate.startOf("day");
+    
+FoodItem.findOne({
+    where: {
+    id: req.body.foodItemId,
+    },
+    include : Organization
+}).then((foodItem) => {
+    lunchCutOff = foodItem.Organization.lunch_cutoff.split(":");
+    dinnerCutOff = foodItem.Organization.dinner_cutoff.split(":");
+    if (foodItem && domain === foodItem.OrganizationDomain) {
+        if (
+            isTimeValid(currentDate, foodItem, currentHour, lunchCutOff, currentMinutes, dinnerCutOff)
+        ) {
+            const otp = book();
+            Order.create({
+            FoodItemId: req.body.foodItemId,
+            name: foodItem.name,
+            date: currentDate,
+            empId: user,
+            otp: otp,
+            status: orderStatus.PENDING,
+            OrganizationDomain: domain,
+            })
+            .then((result) => {
+                console.log(result);
+                return res.send({ otp: result.otp, status: result.status});
+            })
+            .catch((err) => {
+                return res.send(err);
+            });
+        } 
+        else {
+            return res
+            .status(403)
+            .send("Booking time for this food item is over now");
         }
-    }).then(org => {
-        lunchCutOff = org.lunch_cutoff.split(":");
-        dinnerCutOff = org.dinner_cutoff.split(":");
-        FoodItem.findOne({
-            where: {
-                id: req.body.foodItemId
-            }
-        }).then(foodItem => {
-            console.log(foodItem.date);
-            console.log(currentDate);
-            const specificDate = moment('2023-07-12', 'YYYY-MM-DD').tz('Asia/Kolkata');
-            if (foodItem && domain === foodItem.OrganizationDomain) {
-              if ((date.trim("T")[0] == currentDate.trim("T")[0] && foodItem.menuType == 'lunch' && (currentHour < lunchCutOff[0] || (currentHour === lunchCutOff[0] && currentMinutes <= lunchCutOff[1]))) || 
-              (date == currentDate && foodItem.menuType == 'dinner' && (currentHour < dinnerCutOff[0] || (currentHour === dinnerCutOff[0] && currentMinutes <= dinnerCutOff[1]))) ||
-              (date > currentDate)) {
-                const otp = this.book();
-                console.log(otp);
-                Order.create({
-                    FoodItemId : req.body.foodItemId,
-                    name: foodItem.name,
-                    date: moment(new Date()),
-                    empId: user,
-                    otp: otp,
-                    status: orderStatus.PENDING,
-                    OrganizationDomain: domain
-                }).then(result => {
-                    console.log(result);
-                    return res.send(result);
-                }).catch(err => {
-                    return res.send(err)
-                })
-              }
-              else {
-                return  res.status(403).send("Booking time for this food item is over now");
-              }
-            }
-            else{
-                return res.status(404).send("Food item not available");
-            }
-        })
-    })
-}
+    } else {
+        return res.status(404).send("Food item not available");
+    }
+  });
+};
 
 module.exports.fetchOrdersForUser = (req, res, next) => {
-    const user = req.user;
-    Order.findAll({
-        where: {
-            empId: user
-        },
-        include : {
-            all : true
-        }
-    }).then(result => {
-        console.log(result);
-        return res.send(result);
-    })
+  const user = req.user;
+  Order.findAll({
+    where: {
+      empId: user,
+    },
+    include: {
+      all: true,
+    },
+  }).then((result) => {
+    console.log(result);
+    return res.send(result);
+  });
+};
 
-}
-
-const workSheetColumnNames = [
-    "User ",
-    "Name"
-];
+const workSheetColumnNames = ["User ", "Name"];
 // const filePath = './orders.xlsx';
 
 module.exports.getAllOrders = (req, res, next) => {
-    menuType = req.query.type
-    domain = req.query.org
-    toMail = req.query.toMail
-    currentDate = new Date();
-    Order.findAll({
-        // where: {
-        //     date: {
-        //         [Op.like]:  `%${currentDate.split(",")[0]}%`
-        //     }
-        // },
-        include: [{
-            model: FoodItem,
-            where: { menuType:  menuType,
-                    OrganizationDomain:domain,
-                    //servedOn: currentDate.getDay()
-                 },
-            right: true // has no effect, will create an inner join
-          }]
-    }).then(result => {
-        if(result.length == 0){
-            res.status(203).send("No orders found.")
-        }
-       
-        const date = new Date().getDate() + "-" + (new Date().getMonth() + 1);
-        const fileName = `${date}_${menuType}_${domain}_orders.xlsx`
-        const filePath = `./${fileName}`
-        excelExporter.exportOrdersToExcel(result, workSheetColumnNames, filePath);
-        sendRawMail(filePath,fileName,toMail).then(resp => {
-            res.send(resp)
-        }).catch(err => {
-            return res.send(err);
+  menuType = req.query.type;
+  domain = req.query.org;
+  toMail = req.query.toMail;
+  currentDate = new Date();
+  Order.findAll({
+    // where: {
+    //     date: {
+    //         [Op.like]:  `%${currentDate.split(",")[0]}%`
+    //     }
+    // },
+    include: [
+      {
+        model: FoodItem,
+        where: {
+          menuType: menuType,
+          OrganizationDomain: domain,
+          //servedOn: currentDate.getDay()
+        },
+        right: true, // has no effect, will create an inner join
+      },
+    ],
+  }).then((result) => {
+    if (result.length == 0) {
+      res.status(203).send("No orders found.");
+    }
 
-        });
-    });
- }
+    const date = new Date().getDate() + "-" + (new Date().getMonth() + 1);
+    const fileName = `${date}_${menuType}_${domain}_orders.xlsx`;
+    const filePath = `./${fileName}`;
+    excelExporter.exportOrdersToExcel(result, workSheetColumnNames, filePath);
+    sendRawMail(filePath, fileName, toMail)
+      .then((resp) => {
+        res.send(resp);
+      })
+      .catch((err) => {
+        return res.send(err);
+      });
+  });
+};
 
-module.exports.book = () => {
-   const otpGenerator = require('otp-generator')
-   const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
-   return otp;
+function book() {
+  const otpGenerator = require("otp-generator");
+  const otp = otpGenerator.generate(6, {
+    upperCaseAlphabets: false,
+    specialChars: false,
+    lowerCaseAlphabets: false
+  });
+  return otp;
+};
+
+
+function isTimeValid(currentDate, foodItem, currentHour, lunchCutOff, currentMinutes, dinnerCutOff) {
+    return (currentDate.isSame(foodItem.date) &&
+        foodItem.menuType == "lunch" &&
+        (currentHour < lunchCutOff[0] ||
+            (currentHour === lunchCutOff[0] &&
+                currentMinutes <= lunchCutOff[1]))) ||
+        (currentDate.isSame(foodItem.date) &&
+            foodItem.menuType == "dinner" &&
+            (currentHour < dinnerCutOff[0] ||
+                (currentHour === dinnerCutOff[0] &&
+                    currentMinutes <= dinnerCutOff[1]))) ||
+        currentDate.isBefore(foodItem.date);
 }
-
 // module.exports.qrcode = async (req, res, next) => {
 //     let name = Math.random() + 'qr.png'
 //     QRCode.toFile(name, 'www.google.com', {
@@ -180,9 +181,8 @@ module.exports.book = () => {
 //     })
 // }
 
-
 // module.exports.getQr = async(req,res,next) => {
-   
+
 //    const params = {
 //       Bucket: "testbucketamitt",
 //       Key: "download.png",
@@ -200,5 +200,5 @@ module.exports.book = () => {
 //  } catch (err) {
 //    console.error(err);
 //  }
- 
+
 //}
