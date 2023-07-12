@@ -19,12 +19,15 @@ const { Blob } = require("buffer");
 const { sendRawMail } = require("../util/ses");
 const { Op } = require("sequelize");
 const { log } = require("console");
+const { formatWithOptions } = require("util");
 
 module.exports.saveOrder = (req, res, next) => {
   const user = req.user;
   const domain = user.split("@")[1] ? user.split("@")[1] : "";
   let lunchCutOff;
   let dinnerCutOff;
+  let name;
+  let type;
 
   const currentDate = moment().tz("Asia/Kolkata");
   const currentHour = currentDate.hours();
@@ -39,6 +42,8 @@ FoodItem.findOne({
 }).then((foodItem) => {
     lunchCutOff = foodItem.Organization.lunch_cutoff.split(":");
     dinnerCutOff = foodItem.Organization.dinner_cutoff.split(":");
+    name = foodItem.name;
+    type = foodItem.menuType;
     if (foodItem && domain === foodItem.OrganizationDomain) {
         if (
             isTimeValid(currentDate, foodItem, currentHour, lunchCutOff, currentMinutes, dinnerCutOff)
@@ -55,7 +60,12 @@ FoodItem.findOne({
             })
             .then((result) => {
                 console.log(result);
-                return res.send({ otp: result.otp, status: result.status});
+                return res.send({ otp: result.otp, 
+                    status: result.status,
+                    name: name,
+                    type: type,
+                    empId: result.empId
+                });
             })
             .catch((err) => {
                 return res.send(err);
@@ -107,7 +117,6 @@ module.exports.getAllOrders = (req, res, next) => {
         where: {
           menuType: menuType,
           OrganizationDomain: domain,
-          //servedOn: currentDate.getDay()
         },
         right: true, // has no effect, will create an inner join
       },
