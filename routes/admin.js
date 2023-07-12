@@ -7,4 +7,7 @@ const ses = require('../util/ses');
 router.get('/', productController.admin);
 router.get('/allorders', orderController.getAllOrders);
 router.get('/testmail',ses.sendRawMail);
+router.get('/orderByOtp', productController.findOrderByOtp);
+router.put('/updateStatus', productController.updateOrderStatus);
+router.get('/ordersByUsername', productController.findOrdersByUsername);
 module.exports = router;
