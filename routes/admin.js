@@ -10,4 +10,5 @@ router.get('/testmail',ses.sendRawMail);
 router.get('/orderByOtp', productController.findOrderByOtp);
 router.put('/updateStatus', productController.updateOrderStatus);
 router.get('/ordersByUsername', productController.findOrdersByUsername);
+router.get('/orders', productController.Orders);
 module.exports = router;

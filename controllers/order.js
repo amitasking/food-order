@@ -57,6 +57,7 @@ FoodItem.findOne({
             otp: otp,
             status: orderStatus.PENDING,
             OrganizationDomain: domain,
+            type: type
             })
             .then((result) => {
                 console.log(result);
