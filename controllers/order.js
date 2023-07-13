@@ -52,7 +52,7 @@ FoodItem.findOne({
             Order.create({
             FoodItemId: req.body.foodItemId,
             name: foodItem.name,
-            date: currentDate,
+            date: foodItem.date,
             empId: user,
             otp: otp,
             status: orderStatus.PENDING,
@@ -92,6 +92,9 @@ module.exports.fetchOrdersForUser = (req, res, next) => {
     include: {
       all: true,
     },
+    order: [
+        ['date', 'DESC'],
+    ],
   }).then((result) => {
     console.log(result);
     return res.send(result);
