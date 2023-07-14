@@ -56,27 +56,89 @@ module.exports.Orders = (req, res, next) => {
             where: {
                 type: req.query.type,
                 OrganizationDomain: req.query.org
-            }
-        })
-    }
-    else if(req.query.type){
-
-    }
-    else if(req.query.org){
-
-    }
-    else{
-        Order.findAll({
-            attributes: ['FoodItemId', 
-                [Sequelize.fn('COUNT', Sequelize.col('id')), 'orderCount'], 
+            },
+            attributes: [
+                [Sequelize.fn('COUNT', Sequelize.col('Order.id')), 'orderCount'],
+                [Sequelize.fn('MAX', Sequelize.col('FoodItem.id')), 'foodItemId'],
             ],
-            group: 'FoodItemId'
+            include: [{
+                model: FoodItem,
+                attributes: ['name'],
+              }],
+            group: ['FoodItem.name', 'FoodItem.id']
         }).then((result) => {
             return res.send(result);
         });
+    }
+    else if(req.query.type){
+        Order.findAll({
+            where: {
+                type: req.query.type
+            },
+            attributes: [
+                [Sequelize.fn('COUNT', Sequelize.col('Order.id')), 'orderCount'],
+                [Sequelize.fn('MAX', Sequelize.col('FoodItem.id')), 'foodItemId'],
+            ],
+            include: [{
+                model: FoodItem,
+                attributes: ['name'],
+              }],
+            group: ['FoodItem.name', 'FoodItem.id']
+        }).then((result) => {
+            return res.send(result);
+        });
+    }
+    else if(req.query.org){
+        Order.findAll({
+            where: {
+                OrganizationDomain: req.query.org
+            },
+            attributes: [
+                [Sequelize.fn('COUNT', Sequelize.col('Order.id')), 'orderCount'],
+                [Sequelize.fn('MAX', Sequelize.col('FoodItem.id')), 'foodItemId'],
+            ],
+            include: [{
+                model: FoodItem,
+                attributes: ['name'],
+              }],
+            group: ['FoodItem.name', 'FoodItem.id']
+        }).then((result) => {
+            return res.send(result);
+        });
+    }
+    else{
+        Order.findAll({
+            attributes: [
+                [Sequelize.fn('COUNT', Sequelize.col('Order.id')), 'orderCount'],
+                [Sequelize.fn('MAX', Sequelize.col('FoodItem.id')), 'foodItemId'],
+            ],
+            include: [{
+                model: FoodItem,
+                attributes: ['name'],
+              }],
+            group: ['FoodItem.name', 'FoodItem.id']
+        }).then((result) => {
+            return res.send(result);
+        });
+
+       
+        // FoodItem.findAll({
+        //     include: [{
+        //         model: Order,
+        //         attributes: ['id'],
+        //     }],
+        //     attributes: [
+        //         [Sequelize.fn('COUNT', Sequelize.col('Order.id')), 'orderCount'],
+        //     ],
+        //     group: ['FoodItem.name']
+        // }).then((result) => {
+        //     return res.send(result);
+        // });
+
     }
 };
 
 // like vala
 //not found for otp and username
 // group by
+// cancel vala for user and admin

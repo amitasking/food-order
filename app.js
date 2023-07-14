@@ -150,6 +150,7 @@ app.use('/organization', organizationRouter);
 
 // association
 Order.belongsTo(FoodItem, { constraints: true, onDelete: 'CASCADE' })
+FoodItem.hasMany(Order, { constraints: true, onDelete: 'CASCADE' });
 FoodItem.belongsTo(FoodType, { constraints: true, onDelete: 'CASCADE' })
 FoodItem.belongsTo(Organization, { constraints: true, onDelete: 'CASCADE' })
 Order.belongsTo(Organization, { constraints: true, onDelete: 'CASCADE' })
