@@ -33,6 +33,9 @@ module.exports.findOrderByOtp = (req, res, next) => {
         },
         include: FoodItem
     }).then((result) => {
+        if(result.length === 0){
+            return res.status(404).send("Order not found.")
+        }
         return res.send(result);
     });
 };
@@ -46,7 +49,10 @@ module.exports.findOrdersByUsername = (req, res, next) => {
         },
         include: FoodItem
     }).then((result) => {
-      return res.send(result);
+        if(result.length === 0){
+            return res.status(404).send("Order not found.")
+        }
+        return res.send(result);
     });
 };
 
@@ -138,7 +144,4 @@ module.exports.Orders = (req, res, next) => {
     }
 };
 
-// like vala
-//not found for otp and username
-// group by
 // cancel vala for user and admin
