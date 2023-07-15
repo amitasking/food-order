@@ -3,7 +3,8 @@ var router = express.Router();
 const orderController = require('../controllers/order')
 
 router.post('/', orderController.saveOrder);
-router.get('',orderController.fetchOrdersForUser)
+router.get('',orderController.fetchOrdersForUser);
+router.put('/cancel', orderController.cancelOrder);
 // router.get('/qr',orderController.qrcode)
 // router.get('/getqr',orderController.getQr)
 //router.get('/book',orderController.book)

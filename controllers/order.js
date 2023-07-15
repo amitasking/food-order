@@ -101,6 +101,22 @@ module.exports.fetchOrdersForUser = (req, res, next) => {
   });
 };
 
+module.exports.cancelOrder = (req, res, next) => {
+    const user = req.user;
+    Order.findOne({
+        where: {
+            id: req.body.id
+        }
+    }).then((result) => {
+        if(result.empId != user){
+            return res.status(400).send("This order belongs to some other person. Please try with a different order.")
+        }
+        result.status = orderStatus.CANCELLED;
+        result.save();
+        return res.send(result);
+    });
+  };
+
 const workSheetColumnNames = ["User ", "Name"];
 // const filePath = './orders.xlsx';
 
