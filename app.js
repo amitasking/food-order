@@ -53,6 +53,8 @@ const options = {
   },
   TTL: 60,
 };
+app.use('/admin', adminRouter);
+app.use('/organization', organizationRouter);
 
 app.use(async (req, res, next) => {
   try {
@@ -144,9 +146,8 @@ app.post('/notification/register', (req, res, next) => {
 })
 
 app.use('/order', orderRouter);
-app.use('/admin', adminRouter);
+
 app.use('/fooditem', foodItemRouter);
-app.use('/organization', organizationRouter);
 
 // association
 Order.belongsTo(FoodItem, { constraints: true, onDelete: 'CASCADE' })
@@ -163,3 +164,5 @@ seq.sync({ force: false }).then(res => {
   .catch(err => {
     console.log(err);
   })
+
+
